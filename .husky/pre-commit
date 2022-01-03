@@ -1,0 +1,9 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd frontend
+npx pretty-quick --staged && ng lint
+
+cd ../backend
+npx pretty-quick --staged && npm run lint
+
