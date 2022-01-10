@@ -24,4 +24,12 @@ export class UserController {
       console.log(userDto);
       return this.userService.insertOne(userDto);
    }
+
+   @Post('greeting')
+   async greetingMessage(@Body() body: { msg: string }) {
+      console.log(body.msg);
+      return {
+         message: 'Bonjour',
+      };
+   }
 }
