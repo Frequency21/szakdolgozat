@@ -1,26 +1,32 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import {
+   ServeStaticModule,
+   ServeStaticModuleOptions,
+} from '@nestjs/serve-static';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dbConfig from './config/database.config';
+import staticServeConfig from './config/serve-static.config';
 import { UserModule } from './user/user.module';
 
 @Module({
    imports: [
       ConfigModule.forRoot({
-         load: [dbConfig],
-         isGlobal: true,
+         load: [dbConfig, staticServeConfig],
+      }),
+      ServeStaticModule.forRootAsync({
+         imports: [ConfigModule],
+         inject: [ConfigService],
+         useFactory: async (configService: ConfigService) =>
+            configService.get<ServeStaticModuleOptions[]>('serveStatic')!,
       }),
       TypeOrmModule.forRootAsync({
          imports: [ConfigModule],
-         useFactory: async (configService: ConfigService) =>
-            configService.get('typeorm'),
          inject: [ConfigService],
+         useFactory: async (configService: ConfigService) =>
+            configService.get<TypeOrmModuleOptions>('typeorm.heroku')!,
       }),
       UserModule,
    ],
-   controllers: [AppController],
-   providers: [AppService],
 })
 export class AppModule {}
