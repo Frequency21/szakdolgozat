@@ -1,0 +1,41 @@
+<form
+   id="login-form"
+   class="p-fluid formgrid grid"
+   [formGroup]="loginForm"
+   (ngSubmit)="onSubmit()"
+>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input id="email" type="email" pInputText formControlName="email" />
+         <label for="email">Email</label>
+      </span>
+   </div>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input
+            id="password"
+            type="password"
+            pInputText
+            formControlName="password"
+         />
+         <label for="password">Jelszó</label>
+      </span>
+   </div>
+   <p-button
+      id="login-btn"
+      class="col-12 pb-3 md:col-6 md:pb-0"
+      type="submit"
+      label="Bejelentkezés"
+   ></p-button>
+   <div class="col-12 md:col-6">
+       <button
+          id="register-btn"
+          class="p-button-secondary"
+          type="button"
+          (click)="onRegister()"
+          label="Regisztráció"
+          pButton
+          pRipple
+       ></button>
+   </div>
+</form>

@@ -11,6 +11,7 @@ export default registerAs(
          type: 'postgres',
          entities: ['dist/**/*.entity.js'],
          synchronize: true,
+         dropSchema: true,
          autoLoadEntities: true,
          extra: {
             ssl: {

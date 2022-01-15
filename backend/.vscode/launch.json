@@ -5,7 +5,8 @@
          "command": "npm run start:debug",
          "name": "Npm run start:debug",
          "request": "launch",
-         "type": "node-terminal"
+         "type": "node-terminal",
+         "skipFiles": ["<node_internals>/**"]
       }
    ]
 }

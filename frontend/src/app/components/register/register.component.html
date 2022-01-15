@@ -1,0 +1,84 @@
+<p-toast position="top-center"></p-toast>
+
+<form
+   id="register-form"
+   class="p-fluid formgrid grid"
+   [formGroup]="registerForm"
+   (ngSubmit)="onSubmit()"
+>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            autocomplete="name"
+         />
+         <label for="name">Név</label>
+      </span>
+   </div>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input
+            id="email"
+            type="email"
+            pInputText
+            formControlName="email"
+            autocomplete="email"
+         />
+         <label for="email">Email</label>
+      </span>
+   </div>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input
+            id="password"
+            type="password"
+            pInputText
+            formControlName="password"
+            (keyup)="registerForm.controls?.['passwordRe']?.updateValueAndValidity()"
+            autocomplete="new-password"
+         />
+         <label for="password">Jelszó</label>
+      </span>
+   </div>
+   <div class="field col-12">
+      <span class="p-float-label">
+         <input
+            id="password-re"
+            type="password"
+            pInputText
+            formControlName="passwordRe"
+            autocomplete="new-password"
+         />
+         <label for="password-re">Jelszó újra</label>
+      </span>
+      <small id="password-help" class="p-error" *ngIf="passwordsMatch"
+         >A jelszók nem egyeznek!</small
+      >
+   </div>
+   <p-button
+      id="register-btn"
+      class="text-center col-12 pb-3 md:col-5 md:pb-0"
+      type="submit"
+      [disabled]="
+         registerForm.invalid && (registerForm.dirty || registerForm.touched)
+      "
+      label="Regisztráció"
+   ></p-button>
+   <!-- a div container szükséges, mivel a css p-fluid p-button rulenál
+        a width-et 100%-ra állítja -->
+   <div class="col-12 md:col-7">
+      <button
+         id="back-to-login-btn"
+         class="p-button-secondary"
+         type="button"
+         (click)="onBackToLogin()"
+         label="Vissza a bejelentkezéshez"
+         pButton
+         pRipple
+      >
+      </button>
+   </div>
+</form>

@@ -1,0 +1,12 @@
+:host ::ng-deep {
+    .p-toast-detail {
+        margin: 0 !important;
+        p {
+            margin: 0 !important;
+        }
+
+        p:not(:last-of-type) {
+            margin-bottom: 6pt !important;
+        }
+    }
+}

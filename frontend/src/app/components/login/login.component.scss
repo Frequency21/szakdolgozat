@@ -1,0 +1,17 @@
+#login-form {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+    .col {
+        padding: 0;
+    }
+}
+
+#register-btn {
+    text-align: right;
+}
+
+::ng-deep .p-button-label {
+    text-align: center;
+}

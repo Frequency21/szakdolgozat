@@ -1,5 +1,44 @@
+<p-toast key="app" position="top-center">
+   <ng-template pTemplate="message" let-message>
+      <span
+         [class]="
+            'p-toast-message-icon pi' + (message.icon ? ' ' + message.icon : '')
+         "
+         [ngClass]="{
+            'pi-info-circle': message.severity === 'info',
+            'pi-exclamation-triangle': message.severity === 'warn',
+            'pi-times-circle': message.severity === 'error',
+            'pi-check': message.severity === 'success'
+         }"
+      ></span>
+      <div class="p-toast-message-text">
+         <div class="p-toast-summary">{{ message.summary }}</div>
+         <div class="p-toast-detail">
+            <p *ngFor="let text of message.data">{{ text }}</p>
+         </div>
+      </div>
+   </ng-template>
+</p-toast>
+
 <p-menubar [model]="items">
-   <!-- <input type="text" pInputText placeholder="Search" /> -->
-   <button pButton label="Logout" icon="pi pi-power-off"></button>
+   <ng-template pTemplate="end">
+      <p-button
+         class="mr-3"
+         label="auth"
+         icon="pi pi-lock"
+         (click)="onAuth()"
+      ></p-button>
+      <p-button
+         class="mr-3"
+         label="delete sess"
+         icon="pi pi-exclamation-circle"
+         (click)="onDeleteSession()"
+      ></p-button>
+      <p-button
+         [label]="loggedIn ? 'Kijelentkezés' : 'Bejelentkezés'"
+         [icon]="'pi ' + (loggedIn ? 'pi-power-off' : 'pi-user')"
+         (click)="loggedIn ? onLogout() : onLogin()"
+      ></p-button>
+   </ng-template>
 </p-menubar>
 <router-outlet></router-outlet>

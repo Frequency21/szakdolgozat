@@ -1,6 +1,7 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { env } from 'process';
 import { AppModule } from './app.module';
@@ -10,11 +11,12 @@ async function bootstrap() {
       cors: false,
    });
 
-   app.use(helmet({ contentSecurityPolicy: false })),
-      app.useGlobalPipes(new ValidationPipe());
+   app.use(cookieParser());
+   app.use(helmet({ contentSecurityPolicy: false }));
+   app.useGlobalPipes(new ValidationPipe());
    app.setGlobalPrefix('api');
 
-   const config = new DocumentBuilder()
+   const documentConfig = new DocumentBuilder()
       .setContact(
          'DeepMarket',
          'https://deep-market.herokuapp.com/',
@@ -24,7 +26,7 @@ async function bootstrap() {
       .setDescription(`The ${env.APP_TITLE || 'DeepMarket'} API description`)
       .setVersion(env.npm_package_version || '1.0.0')
       .build();
-   const document = SwaggerModule.createDocument(app, config);
+   const document = SwaggerModule.createDocument(app, documentConfig);
    SwaggerModule.setup('api-doc', app, document);
 
    Logger.log(
