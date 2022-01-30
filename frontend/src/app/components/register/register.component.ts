@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/auth/auth.service';
 import { matchValidator } from 'src/app/validators/match.validator';
+declare var google: any;
 
 @Component({
    selector: 'app-register',

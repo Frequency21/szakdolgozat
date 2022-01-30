@@ -18,6 +18,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CookieAuthGuard } from './guards/cookie-auth.guard';
 import { LogInWithCredentialsGuard } from './guards/login-with-credentials.guard';
+import { LoginWithGoogleGuard } from './guards/login-with-google.guard';
 import { ReqWithUser } from './interfaces/req-with-user.interface';
 
 @ApiTags('authentication')
@@ -38,6 +39,18 @@ export class AuthController {
    @Post('login')
    async logIn(@Req() request: ReqWithUser) {
       return request.user;
+   }
+
+   @UseGuards(LoginWithGoogleGuard)
+   @Get('login/google')
+   async loginWithGoogle() {
+      //
+   }
+
+   @UseGuards(LoginWithGoogleGuard)
+   @Get('google/redirect')
+   async signInWithGoogleRedirect(@Req() req) {
+      return this.authService.signInWithGoogle(req);
    }
 
    @HttpCode(200)

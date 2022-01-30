@@ -23,19 +23,21 @@
    </div>
    <p-button
       id="login-btn"
-      class="col-12 pb-3 md:col-6 md:pb-0"
+      class="col-12 mb-3"
       type="submit"
-      label="Bejelentkezés"
+      label="Bejelentkezés emaillel és jelszóval"
    ></p-button>
-   <div class="col-12 md:col-6">
-       <button
-          id="register-btn"
-          class="p-button-secondary"
-          type="button"
-          (click)="onRegister()"
-          label="Regisztráció"
-          pButton
-          pRipple
-       ></button>
+   <div class="col-12 flex justify-content-center md:justify-content-start align-items-center mb-3 md:col-5">Vagy bejelentkezés Google-fiókkal:</div>
+   <div id="google-sign-in-btn" class="col-12 flex justify-content-center md:justify-content-end mb-3 md:col-7"></div>
+   <div class="col-12">
+      <button
+         id="register-btn"
+         class="p-button-secondary"
+         type="button"
+         (click)="onRegister()"
+         label="Regisztráció"
+         pButton
+         pRipple
+      ></button>
    </div>
 </form>

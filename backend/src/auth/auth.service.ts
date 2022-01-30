@@ -16,6 +16,10 @@ export class AuthService {
       });
    }
 
+   signInWithGoogle(req: any) {
+      console.log(req);
+   }
+
    public async getAuthenticatedUser(email: string, plainTextPassword: string) {
       const user = await this.usersService.getByEmail(email);
       const isMatching = await bcrypt.compare(plainTextPassword, user.password);
