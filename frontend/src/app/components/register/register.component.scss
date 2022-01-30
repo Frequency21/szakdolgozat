@@ -1,8 +1,12 @@
 #register-form {
-    position: absolute;
-    left: 50%;
-    top: 25%;
-    transform: translate(-50%, -50%);
+    position: relative;
+    left: 25vw;
+    width: 50vw;
+    @media screen and (max-width: 768px) {
+        left: 10vw;
+        width: 80vw;
+    }
+    top: 15vh;
     .col {
         padding: 0;
     }
