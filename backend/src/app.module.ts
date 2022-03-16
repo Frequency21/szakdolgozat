@@ -55,7 +55,11 @@ export class AppModule {
                saveUninitialized: false,
                cookie: {
                   sameSite: true,
-                  httpOnly: env.SSL == 'true' || true,
+                  httpOnly: env.SSL
+                     ? env.SSL === 'true'
+                        ? true
+                        : false
+                     : true,
                   maxAge: 86400000,
                },
             }),
