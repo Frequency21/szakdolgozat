@@ -12,13 +12,13 @@ import {
    UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { User } from 'src/user/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CookieAuthGuard } from './guards/cookie-auth.guard';
 import { LogInWithCredentialsGuard } from './guards/login-with-credentials.guard';
-import { ReqWithUser } from './interfaces/req-with-user.interface';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -36,28 +36,28 @@ export class AuthController {
    @HttpCode(200)
    @UseGuards(LogInWithCredentialsGuard)
    @Post('login')
-   async logIn(@Req() request: ReqWithUser) {
+   async logIn(@Req() request: Request) {
       return request.user;
    }
 
    @HttpCode(200)
    @UseGuards(CookieAuthGuard)
    @Get()
-   async authenticate(@Req() request: ReqWithUser) {
+   async authenticate(@Req() request: Request) {
       return request.user;
    }
 
    @HttpCode(200)
    @UseGuards(CookieAuthGuard)
    @Delete('logout')
-   async logOut(@Req() request: ReqWithUser) {
+   async logOut(@Req() request: Request) {
       this.authService.logout(request);
    }
 
    @HttpCode(200)
    @UseGuards(CookieAuthGuard)
    @Delete('destroy-session')
-   async destroySession(@Req() request: ReqWithUser) {
+   async destroySession(@Req() request: Request) {
       request.session.destroy((err: any) => {
          Logger.error(`Error while destroying session:\n${err}`, 'Session');
       });
