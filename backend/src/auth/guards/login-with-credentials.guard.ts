@@ -12,9 +12,14 @@ export class LogInWithCredentialsGuard extends AuthGuard('local') {
       await super.canActivate(context);
 
       const request = context.switchToHttp().getRequest();
-      await super.logIn(request);
+      // ha van megfelelő email címmel és jelszóval elmentett user
+      if (request.user) {
+         // akkor hozzuk létre a sessionjét a session storeban
+         await super.logIn(request);
+         return true;
+      }
 
-      return true;
+      return false;
    }
 
    handleRequest(err: any, user: any) {
