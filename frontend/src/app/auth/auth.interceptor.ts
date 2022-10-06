@@ -24,7 +24,6 @@ export class AuthInterceptor implements HttpInterceptor {
    ): Observable<HttpEvent<unknown>> {
       return next.handle(request).pipe(
          catchError((err: HttpErrorResponse) => {
-            console.log('err:', err);
             if (err.status === HttpStatusCode.Unauthorized) {
                if (this.auth.loggedIn.value) {
                   this.messageService.add({

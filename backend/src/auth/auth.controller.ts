@@ -59,7 +59,9 @@ export class AuthController {
    @Delete('destroy-session')
    async destroySession(@Req() request: Request) {
       request.session.destroy((err: any) => {
-         Logger.error(`Error while destroying session:\n${err}`, 'Session');
+         if (err !== null) {
+            Logger.error(`Error while destroying session:\n${err}`, 'Session');
+         }
       });
    }
 }

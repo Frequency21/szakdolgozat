@@ -20,7 +20,7 @@
    </ng-template>
 </p-toast>
 
-<p-menubar [model]="items">
+<p-menubar [model]="(items$ | async)!">
    <ng-template pTemplate="end">
       <p-button
          class="mr-3"
