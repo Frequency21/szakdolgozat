@@ -5,11 +5,10 @@ import {
    Post,
    UseInterceptors,
 } from '@nestjs/common';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 
 @ApiTags('user')
-@ApiCookieAuth()
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {

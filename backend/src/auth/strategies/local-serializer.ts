@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -13,6 +13,7 @@ export class LocalSerializer extends PassportSerializer {
       if (user) {
          done(null, user.id);
       } else {
+         // this should never happen
          done(new Error());
       }
    }

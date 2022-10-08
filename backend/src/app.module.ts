@@ -12,6 +12,7 @@ import dbConfig from './config/database.config';
 import { REDIS } from './config/redis/redis.conts';
 import { RedisModule } from './config/redis/redis.module';
 import { staticServeConfig } from './config/serve-static.config';
+import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 @Module({
    imports: [
@@ -26,8 +27,9 @@ import { UserModule } from './user/user.module';
             configService.get<TypeOrmModuleOptions>('typeorm.heroku')!,
       }),
       RedisModule,
-      UserModule,
       AuthModule,
+      UserModule,
+      ProductModule,
    ],
 })
 export class AppModule {
@@ -35,7 +37,7 @@ export class AppModule {
 
    async configure(consumer: MiddlewareConsumer) {
       try {
-         await this.redisClient?.connect();
+         await this.redisClient.connect();
       } catch (err) {
          Logger.error(
             "Couldn't connect to Redis. Application shutdown",
