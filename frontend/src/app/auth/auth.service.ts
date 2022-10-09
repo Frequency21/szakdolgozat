@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { User } from '../models/user.model';
 
 @Injectable({
    providedIn: 'root',
@@ -8,13 +9,7 @@ import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 export class AuthService {
    readonly loggedIn = new BehaviorSubject<boolean>(false);
 
-   loggedIn$ = this.loggedIn.asObservable().pipe(
-      tap(value => {
-         if (isDevMode()) {
-            console.log('is logged in:', value);
-         }
-      }),
-   );
+   loggedIn$ = this.loggedIn.asObservable();
 
    constructor(private http: HttpClient) {}
 
@@ -46,6 +41,21 @@ export class AuthService {
             { observe: 'response' },
          )
          .pipe(map(resp => resp.ok));
+   }
+
+   googleSignIn(jwt: string) {
+      return this.http
+         .post<User | null>(
+            '/api/auth/google-sign-in',
+            { jwt },
+            { observe: 'response' },
+         )
+         .pipe(
+            tap(resp => {
+               this.loggedIn.next(resp.ok);
+            }),
+            map(resp => resp.body),
+         );
    }
 
    login(email: string, password: string): Observable<boolean> {

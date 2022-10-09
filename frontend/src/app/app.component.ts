@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
-import { ReplaySubject, takeUntil } from 'rxjs';
+import { map, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 
 @Component({
@@ -13,9 +13,9 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent implements OnInit, OnDestroy {
    private destroyed$ = new ReplaySubject<void>();
 
-   loggedIn?: boolean;
+   loggedIn!: boolean;
 
-   items!: MenuItem[];
+   items$: Observable<MenuItem[]>;
 
    constructor(
       private primengConfig: PrimeNGConfig,
@@ -26,23 +26,16 @@ export class AppComponent implements OnInit, OnDestroy {
       this.authService.loggedIn$
          .pipe(takeUntil(this.destroyed$))
          .subscribe(loggedIn => (this.loggedIn = loggedIn));
+
+      this.items$ = this.authService.loggedIn$.pipe(
+         takeUntil(this.destroyed$),
+         map(this.getMenuItems.bind(this)),
+      );
    }
 
    ngOnInit(): void {
       this.primengConfig.ripple = true;
       this.authService.autoLogin();
-      this.items = [
-         {
-            label: 'Users',
-            icon: 'pi pi-fw pi-user',
-            routerLink: ['users'],
-         },
-         {
-            label: 'Users',
-            icon: 'pi pi-fw pi-user',
-            routerLink: ['users'],
-         },
-      ];
    }
 
    ngOnDestroy(): void {
@@ -68,5 +61,21 @@ export class AppComponent implements OnInit, OnDestroy {
       this.http
          .delete('/api/auth/destroy-session', { observe: 'response' })
          .subscribe(resp => console.log(resp));
+   }
+
+   private getMenuItems(isLoggedIn: boolean): MenuItem[] {
+      return [
+         {
+            label: 'Profil',
+            icon: 'pi pi-fw pi-user',
+            routerLink: ['users/profile'],
+            visible: isLoggedIn,
+         },
+         {
+            label: 'Users',
+            icon: 'pi pi-fw pi-user',
+            routerLink: ['users'],
+         },
+      ];
    }
 }

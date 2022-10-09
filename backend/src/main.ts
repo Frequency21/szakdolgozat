@@ -16,6 +16,7 @@ async function bootstrap() {
    app.useGlobalPipes(new ValidationPipe());
    app.setGlobalPrefix('api');
 
+   // setup swagger
    const documentConfig = new DocumentBuilder()
       .setContact(
          'DeepMarket',
@@ -27,7 +28,12 @@ async function bootstrap() {
       .setVersion(env.npm_package_version || '1.0.0')
       .build();
    const document = SwaggerModule.createDocument(app, documentConfig);
-   SwaggerModule.setup('api-doc', app, document);
+   SwaggerModule.setup('api-doc', app, document, {
+      swaggerOptions: {
+         // may write plugins in future
+         plugins: [],
+      },
+   });
 
    Logger.log(
       `Server is listening on port ${process.env.PORT || 3000}`,

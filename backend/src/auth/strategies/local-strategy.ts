@@ -1,7 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { User } from '../../user/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -9,11 +9,18 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
    constructor(private authService: AuthService) {
       super({ usernameField: 'email' });
    }
-   async validate(email: string, password: string): Promise<User> {
-      const user = await this.authService.getAuthenticatedUser(email, password);
-      if (!user) {
-         throw new UnauthorizedException();
-      }
+
+   /**
+    * @throws NotFoundException if email doesn't exist
+    * @param email
+    * @param password
+    * @returns user or null if password doesn't match
+    */
+   async validate(email: string, password: string): Promise<User | null> {
+      const user = await this.authService.getAuthenticatedUserByEmailAndPassord(
+         email,
+         password,
+      );
       return user;
    }
 }

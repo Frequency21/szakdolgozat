@@ -7,7 +7,11 @@ export default registerAs(
    (): { heroku: TypeOrmModuleOptions; local: TypeOrmModuleOptions } => ({
       heroku: {
          url: env.DATABASE_URL,
-         ssl: env.DATABASE_SSL == 'true' || true,
+         ssl: env.DATABASE_SSL
+            ? env.DATABASE_SSL === 'true'
+               ? true
+               : false
+            : true,
          type: 'postgres',
          entities: ['dist/**/*.entity.js'],
          synchronize: true,
@@ -27,6 +31,7 @@ export default registerAs(
          password: env.DATABASE_PASSWORD,
          database: env.DATABASE_NAME,
          entities: ['dist/**/*.entity.js'],
+         dropSchema: true,
          synchronize: true,
          autoLoadEntities: true,
       },
