@@ -34,28 +34,38 @@ $ npm install
 
 ## Running the app
 
+Deployolásra a heroku platformját használom, mint SaaS.
+
+A heroku biztosít adatbázist és redist is, ami egy in-memory cache. Az app elindításához fel kell venni ezeknek az URL-jét a `.env`-ben.
+A biztonságos működés érdekében TLS kapcsolatotot használ az alkalmazás. Az URL-ek ennek megfelelően a heroku CLI segítségével lekérhetőek:
+
+```bash
+heroku config:get REDIS_TLS_URL -a deep-market
+heroku config:get DATABASE_URL -a deep-market
+```
+
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
 # production mode
-$ npm run start:prod
+npm run start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
 
 ## Support

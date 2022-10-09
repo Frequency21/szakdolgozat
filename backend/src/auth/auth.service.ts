@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { User } from 'src/user/entities/user.entity';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -20,7 +21,17 @@ export class AuthService {
       console.log(req);
    }
 
-   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
+   /**
+    * @throws NotFoundException if email doesn't exist
+    * @param email
+    * @param plainTextPassword
+    * @returns user if password is matching, `null` if there's a user,
+    * but password isn't matching or throws `NotFoundException` if theres no user with {@link email}
+    */
+   public async getAuthenticatedUser(
+      email: string,
+      plainTextPassword: string,
+   ): Promise<User | null> | never {
       const user = await this.usersService.getByEmail(email);
       const isMatching = await bcrypt.compare(plainTextPassword, user.password);
       return isMatching ? user : null;

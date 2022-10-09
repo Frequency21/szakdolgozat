@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 
 @Injectable({
@@ -8,13 +8,7 @@ import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 export class AuthService {
    readonly loggedIn = new BehaviorSubject<boolean>(false);
 
-   loggedIn$ = this.loggedIn.asObservable().pipe(
-      tap(value => {
-         if (isDevMode()) {
-            console.log('is logged in:', value);
-         }
-      }),
-   );
+   loggedIn$ = this.loggedIn.asObservable();
 
    constructor(private http: HttpClient) {}
 

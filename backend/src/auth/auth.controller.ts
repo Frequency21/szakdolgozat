@@ -11,15 +11,23 @@ import {
    UseGuards,
    UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from 'src/user/user.entity';
+import {
+   ApiBody,
+   ApiConflictResponse,
+   ApiCreatedResponse,
+   ApiOkResponse,
+   ApiOperation,
+   ApiTags,
+   ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { Request } from 'express';
+import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CookieAuthGuard } from './guards/cookie-auth.guard';
 import { LogInWithCredentialsGuard } from './guards/login-with-credentials.guard';
 import { LoginWithGoogleGuard } from './guards/login-with-google.guard';
-import { ReqWithUser } from './interfaces/req-with-user.interface';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -27,17 +35,42 @@ import { ReqWithUser } from './interfaces/req-with-user.interface';
 export class AuthController {
    constructor(private readonly authService: AuthService) {}
 
-   @ApiResponse({ status: 201, type: User })
+   @ApiCreatedResponse({
+      type: User,
+      description:
+         'Registration was successful, returning the created new user',
+   })
+   @ApiConflictResponse({
+      description: 'Email is already registered.',
+   })
    @Post('register')
    async register(@Body() registrationData: CreateUserDto) {
       return this.authService.register(registrationData);
    }
 
+   @ApiOperation({
+      description: 'Logs in and returns the authentication cookie',
+   })
    @ApiBody({ type: LoginDto })
-   @HttpCode(200)
+   @ApiCreatedResponse({
+      description: 'Login was successful',
+      headers: {
+         'SET-COOKIE': {
+            schema: {
+               type: 'string',
+               example:
+                  'connect.sid=keyboard cat; Path=/; Expires=Future date; SameSite=Strict',
+            },
+            description: 'Authentication cookie',
+         },
+      },
+   })
+   @ApiUnauthorizedResponse({
+      description: 'email is not registered or password is invalid',
+   })
    @UseGuards(LogInWithCredentialsGuard)
    @Post('login')
-   async logIn(@Req() request: ReqWithUser) {
+   async logIn(@Req() request: Request) {
       return request.user;
    }
 
@@ -47,32 +80,30 @@ export class AuthController {
       //
    }
 
-   @UseGuards(LoginWithGoogleGuard)
-   @Get('google/redirect')
-   async signInWithGoogleRedirect(@Req() req) {
-      return this.authService.signInWithGoogle(req);
-   }
-
-   @HttpCode(200)
+   @ApiOkResponse()
    @UseGuards(CookieAuthGuard)
    @Get()
-   async authenticate(@Req() request: ReqWithUser) {
+   async authenticate(@Req() request: Request) {
       return request.user;
    }
 
-   @HttpCode(200)
+   @ApiOkResponse({
+      description: 'User logged out, session was succesfully destroyed',
+   })
    @UseGuards(CookieAuthGuard)
    @Delete('logout')
-   async logOut(@Req() request: ReqWithUser) {
+   async logOut(@Req() request: Request) {
       this.authService.logout(request);
    }
 
    @HttpCode(200)
    @UseGuards(CookieAuthGuard)
    @Delete('destroy-session')
-   async destroySession(@Req() request: ReqWithUser) {
+   async destroySession(@Req() request: Request) {
       request.session.destroy((err: any) => {
-         Logger.error(`Error while destroying session:\n${err}`, 'Session');
+         if (err !== null) {
+            Logger.error(`Error while destroying session:\n${err}`, 'Session');
+         }
       });
    }
 }
