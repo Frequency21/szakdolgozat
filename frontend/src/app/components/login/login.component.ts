@@ -4,7 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+import { environment } from 'src/environments/environment';
 
+// will be defined by google client script
 declare var google: any;
 
 @Component({
@@ -32,17 +34,15 @@ export class LoginComponent implements OnInit {
    ngOnInit(): void {
       this.meta.addTag({
          name: 'google-signin-client_id',
-         content:
-            '841904817921-a66smqafskbantmcb7aqanilgaol22sq.apps.googleusercontent.com',
+         content: environment.googleClientId,
       });
       let gsiClient = this.doc.createElement('script');
       gsiClient.src = 'https://accounts.google.com/gsi/client';
       gsiClient.async = gsiClient.defer = true;
       gsiClient.onload = () => {
          google.accounts.id.initialize({
-            client_id:
-               '841904817921-a66smqafskbantmcb7aqanilgaol22sq.apps.googleusercontent.com',
-            callback: this.handleCredentialResponse,
+            client_id: environment.googleClientId,
+            callback: this.handleCredentialResponse.bind(this),
          });
          google.accounts.id.renderButton(
             document.getElementById('google-sign-in-btn'),
@@ -57,15 +57,14 @@ export class LoginComponent implements OnInit {
    }
 
    handleCredentialResponse(response: any) {
-      console.log('Encoded JWT ID token: ' + response.credential);
+      this.auth.googleSignIn(response.credential).subscribe(user => {
+         console.log('Got user', user);
+      });
    }
 
    onSubmit(): void {
       this.auth
-         .login(
-            this.loginForm.value?.['email'],
-            this.loginForm.value?.['password'],
-         )
+         .login(this.loginForm.value['email'], this.loginForm.value['password'])
          .subscribe(resp => console.log(resp));
    }
 

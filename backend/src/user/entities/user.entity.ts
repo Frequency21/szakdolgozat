@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { Product } from 'src/product/entities/product.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -18,10 +18,21 @@ export class User {
    name!: string;
 
    @Exclude()
-   @Column()
-   password!: string;
+   @Column({ nullable: true, default: null })
+   password?: string;
 
-   @ApiProperty({ type: [Product] })
+   /** Identity provider (in case of OIDC authentication) */
+   @Exclude()
+   @Column({ nullable: true, default: null })
+   idp?: string;
+
+   @Column({ nullable: true, default: null })
+   picture?: string;
+
+   @ApiPropertyOptional({ type: [Product], default: [] })
    @OneToMany(() => Product, (product) => product.owner)
    products!: Product[];
 }
+
+export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &
+   Pick<User, 'picture'>;

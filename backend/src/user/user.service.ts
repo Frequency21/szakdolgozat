@@ -8,8 +8,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/constants/db/postgresql.error.codes';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { RegisterWithPasswordDto } from './dto/register-with-password.dto';
+import { GoogleUser, User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -46,8 +46,23 @@ export class UserService {
       return user;
    }
 
-   async create(userData: CreateUserDto) {
+   async create(userData: RegisterWithPasswordDto) {
       const newUser = this.usersRepository.create(userData);
+      try {
+         await this.usersRepository.save(newUser);
+         return newUser;
+      } catch (err: any) {
+         if (err?.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
+            throw new ConflictException({
+               message: 'User with that email already exists',
+            });
+         }
+         return null;
+      }
+   }
+
+   async registerGoogleUser(googleUser: GoogleUser) {
+      const newUser = this.usersRepository.create(googleUser);
       try {
          await this.usersRepository.save(newUser);
          return newUser;

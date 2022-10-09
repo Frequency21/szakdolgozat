@@ -17,7 +17,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     * @returns user or null if password doesn't match
     */
    async validate(email: string, password: string): Promise<User | null> {
-      const user = await this.authService.getAuthenticatedUser(email, password);
+      const user = await this.authService.getAuthenticatedUserByEmailAndPassord(
+         email,
+         password,
+      );
       return user;
    }
 }

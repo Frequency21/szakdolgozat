@@ -31,6 +31,7 @@ export default registerAs(
          password: env.DATABASE_PASSWORD,
          database: env.DATABASE_NAME,
          entities: ['dist/**/*.entity.js'],
+         dropSchema: true,
          synchronize: true,
          autoLoadEntities: true,
       },
