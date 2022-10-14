@@ -37,9 +37,7 @@
             type="password"
             pInputText
             formControlName="password"
-            (keyup)="
-               registerForm.controls['passwordRe']?.updateValueAndValidity()
-            "
+            (keyup)="registerForm.controls.passwordRe.updateValueAndValidity()"
             autocomplete="new-password"
          />
          <label for="password">Jelszó</label>
@@ -64,9 +62,7 @@
       id="register-btn"
       class="text-center col-12 pb-3 md:col-5 md:pb-3"
       type="submit"
-      [disabled]="
-         registerForm.invalid
-      "
+      [disabled]="registerForm.invalid"
       label="Regisztráció"
    ></p-button>
    <!-- a div container szükséges, mivel a css p-fluid p-button rulenál

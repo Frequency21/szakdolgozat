@@ -24,7 +24,7 @@ export class UserService {
     * @returns user with email or throws error
     */
    async getByEmail(email: string): Promise<User> | never {
-      const user = await this.usersRepository.findOne({ email });
+      const user = await this.usersRepository.findOneBy({ email });
       if (user) return user;
       throw new NotFoundException({
          message: 'User with this email does not exist',
@@ -32,9 +32,9 @@ export class UserService {
    }
 
    async getById(id: number) {
-      let user: User | undefined;
+      let user: User | null = null;
       try {
-         user = await this.usersRepository.findOne({ id });
+         user = await this.usersRepository.findOneBy({ id });
       } catch (err: any) {
          if (err?.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
             throw new HttpException(

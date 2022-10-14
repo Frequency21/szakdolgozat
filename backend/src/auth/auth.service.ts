@@ -1,5 +1,6 @@
 import {
    Injectable,
+   Logger,
    NotFoundException,
    UnauthorizedException,
 } from '@nestjs/common';
@@ -76,7 +77,12 @@ export class AuthService {
    }
 
    public logout(request: Request) {
-      request.logOut();
+      request.logOut({ keepSessionInfo: false }, (err) => {
+         Logger.error(
+            err?.toString() ?? 'Error while trying to destroy session info',
+            'Session',
+         );
+      });
       request.session.cookie.maxAge = 0;
    }
 }

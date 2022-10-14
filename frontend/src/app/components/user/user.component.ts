@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { UserService } from './user.service';
 
 @Component({
@@ -8,11 +8,11 @@ import { UserService } from './user.service';
    styleUrls: ['./user.component.scss'],
 })
 export class UserComponent {
-   form: FormGroup;
+   form: UntypedFormGroup;
 
    response?: string | null;
 
-   constructor(private fb: FormBuilder, private userService: UserService) {
+   constructor(private fb: UntypedFormBuilder, private userService: UserService) {
       this.form = this.fb.group({
          msg: this.fb.control('', [Validators.required]),
       });

@@ -1,6 +1,10 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnInit, Renderer2 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Inject, NgZone, OnInit, Renderer2 } from '@angular/core';
+import {
+   UntypedFormBuilder,
+   UntypedFormGroup,
+   Validators,
+} from '@angular/forms';
 import { Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -15,15 +19,16 @@ declare var google: any;
    styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-   loginForm: FormGroup;
+   loginForm: UntypedFormGroup;
 
    constructor(
-      private fb: FormBuilder,
+      private fb: UntypedFormBuilder,
       private router: Router,
       private auth: AuthService,
       private meta: Meta,
       private renderer: Renderer2,
       @Inject(DOCUMENT) private doc: Document,
+      private ngZone: NgZone,
    ) {
       this.loginForm = this.fb.group({
          email: this.fb.control(null, [Validators.required]),
@@ -57,8 +62,8 @@ export class LoginComponent implements OnInit {
    }
 
    handleCredentialResponse(response: any) {
-      this.auth.googleSignIn(response.credential).subscribe(user => {
-         console.log('Got user', user);
+      this.ngZone.run(() => {
+         this.auth.googleSignIn(response.credential).subscribe();
       });
    }
 

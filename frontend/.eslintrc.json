@@ -12,7 +12,7 @@
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
-      "plugins": ["@typescript-eslint", "unused-imports"],
+      "plugins": ["@typescript-eslint"],
       "rules": {
         // typescript rules
         "curly": "error",
@@ -31,19 +31,6 @@
             "type": "element",
             "prefix": "app",
             "style": "kebab-case"
-          }
-        ],
-
-        // unused imports configs
-        "no-unused-vars": "off",
-        "unused-imports/no-unused-imports": "error",
-        "unused-imports/no-unused-vars": [
-          "warn",
-          {
-            "vars": "all",
-            "varsIgnorePattern": "^_",
-            "args": "after-used",
-            "argsIgnorePattern": "^_"
           }
         ]
       }
