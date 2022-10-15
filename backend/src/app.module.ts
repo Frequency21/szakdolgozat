@@ -14,6 +14,8 @@ import { RedisModule } from './config/redis/redis.module';
 import { staticServeConfig } from './config/serve-static.config';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { CategoryModule } from './category/category.module';
+import { MessageModule } from './message/message.module';
 @Module({
    imports: [
       ConfigModule.forRoot({
@@ -30,6 +32,8 @@ import { UserModule } from './user/user.module';
       AuthModule,
       UserModule,
       ProductModule,
+      CategoryModule,
+      MessageModule,
    ],
 })
 export class AppModule {
