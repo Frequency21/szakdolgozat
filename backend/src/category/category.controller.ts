@@ -27,7 +27,7 @@ export class CategoryController {
    }
 
    @Get()
-   findAll() {
+   findAll(): Promise<Category[]> {
       return this.categoryService.findAll();
    }
 

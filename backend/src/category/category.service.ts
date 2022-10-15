@@ -26,7 +26,7 @@ export class CategoryService {
    }
 
    findAll() {
-      return `This action returns all category`;
+      return this.em.getTreeRepository(Category).findTrees();
    }
 
    findOne(id: number) {
