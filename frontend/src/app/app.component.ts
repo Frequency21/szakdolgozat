@@ -2,8 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
-import { map, Observable, ReplaySubject, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { AuthService } from './auth/auth.service';
+import { Category } from './models/category.model';
+import {
+   CategoryService,
+   deepCloneTree,
+} from './shared/services/category.service';
 
 @Component({
    selector: 'app-root',
@@ -20,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
    constructor(
       private primengConfig: PrimeNGConfig,
       private authService: AuthService,
+      private categoryService: CategoryService,
       private router: Router,
       private http: HttpClient,
    ) {
@@ -27,9 +33,15 @@ export class AppComponent implements OnInit, OnDestroy {
          .pipe(takeUntil(this.destroyed$))
          .subscribe(loggedIn => (this.loggedIn = loggedIn));
 
-      this.items$ = this.authService.loggedIn$.pipe(
+      const loggedIn$ = this.authService.loggedIn$.pipe(
          takeUntil(this.destroyed$),
-         map(this.getMenuItems.bind(this)),
+      );
+      const categories$ = this.categoryService
+         .getAllCategory()
+         .pipe(takeUntil(this.destroyed$));
+
+      this.items$ = combineLatest([loggedIn$, categories$]).pipe(
+         map(args => this.getMenuItems(...args)),
       );
    }
 
@@ -63,7 +75,31 @@ export class AppComponent implements OnInit, OnDestroy {
          .subscribe(resp => console.log(resp));
    }
 
-   private getMenuItems(isLoggedIn: boolean): MenuItem[] {
+   private getMenuItems(
+      isLoggedIn: boolean,
+      categories: Category[],
+   ): MenuItem[] {
+      const initialItems = categories
+         .slice()
+         .sort((a, b) => a.name.localeCompare(b.name))
+         .map(category =>
+            deepCloneTree(
+               category,
+               c =>
+                  ({
+                     label: c.name,
+                     items: c.subCategories.length > 0 ? [] : undefined,
+                  } as MenuItem),
+               'items',
+               true,
+            ),
+         );
+
+      const categoriesItem: MenuItem = {
+         label: 'Kategóriák',
+         items: initialItems.length > 0 ? initialItems : undefined,
+      };
+
       return [
          {
             label: 'Profil',
@@ -71,6 +107,7 @@ export class AppComponent implements OnInit, OnDestroy {
             routerLink: ['users/profile'],
             visible: isLoggedIn,
          },
+         categoriesItem,
          {
             label: 'Users',
             icon: 'pi pi-fw pi-user',

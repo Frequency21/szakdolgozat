@@ -3,7 +3,7 @@ import { Product } from 'src/product/entities/product.entity';
 import {
    Column,
    Entity,
-   OneToOne,
+   OneToMany,
    PrimaryGeneratedColumn,
    Tree,
    TreeChildren,
@@ -18,18 +18,18 @@ export class Category {
    id!: number;
 
    @ApiProperty({ example: 'Cloths and accessories' })
-   @Column()
+   @Column({ unique: true })
    name!: string;
 
    @ApiPropertyOptional({ type: () => [Category] })
-   @TreeChildren()
+   @TreeChildren({ cascade: true })
    subCategories?: Category[];
 
    @ApiPropertyOptional({ type: () => Category })
-   @TreeParent()
+   @TreeParent({ onDelete: 'CASCADE' })
    parentCategory?: Category;
 
    @ApiPropertyOptional({ type: () => Product })
-   @OneToOne(() => Product, (product) => product.category)
-   product?: Product;
+   @OneToMany(() => Product, (product) => product.category)
+   products?: Product[];
 }

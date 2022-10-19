@@ -1,14 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/user/entities/user.entity';
-import {
-   Column,
-   Entity,
-   JoinColumn,
-   ManyToOne,
-   OneToOne,
-   PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Delivery {
    personal = 'personal',
@@ -30,6 +23,7 @@ export class Product {
    @Column()
    price!: number;
 
+   @ApiProperty()
    @Column({ default: false })
    isAuction!: boolean;
 
@@ -41,6 +35,7 @@ export class Product {
    @Column({ nullable: true, default: null })
    minPrice?: number;
 
+   @ApiProperty({ enum: Delivery, default: Delivery.personal })
    @Column('enum', { enum: Delivery, default: Delivery.personal })
    delivery!: Delivery;
 
@@ -48,7 +43,7 @@ export class Product {
    @Column({ nullable: true, default: null })
    weight?: number;
 
-   @ApiProperty()
+   @ApiProperty({ isArray: true })
    @Column('varchar', { array: true })
    pictures?: string[];
 
@@ -61,7 +56,6 @@ export class Product {
    buyer?: User;
 
    @ApiProperty({ type: () => Category })
-   @OneToOne(() => Category, (category) => category.product)
-   @JoinColumn()
+   @ManyToOne(() => Category, (category) => category.products)
    category?: Category;
 }

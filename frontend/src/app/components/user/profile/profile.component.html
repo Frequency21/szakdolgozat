@@ -1,1 +1,82 @@
-<p>profile works!</p>
+<form
+   id="register-form"
+   class="p-fluid formgrid grid mt-5"
+   [formGroup]="categoryForm"
+   (ngSubmit)="createCategory()"
+>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="categoryName"
+            type="text"
+            pInputText
+            formControlName="categoryName"
+            autocomplete="categoryName"
+         />
+         <label for="categoryName">Kategória neve</label>
+      </span>
+   </div>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="parentCategoryId"
+            type="email"
+            pInputText
+            formControlName="parentCategoryId"
+            autocomplete="parentCategoryId"
+         />
+         <label for="parentCategoryId">Szülő kategória</label>
+      </span>
+   </div>
+   <p-button
+      id="register-btn"
+      class="text-center col-12 pb-3 md:col-5 md:pb-3"
+      type="submit"
+      label="Kategória létrehozása"
+   ></p-button>
+</form>
+
+<form
+   id="register-form"
+   class="p-fluid formgrid grid mt-5"
+   [formGroup]="deleteCategoryForm"
+   (ngSubmit)="deleteCategory()"
+>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="categoryId"
+            type="text"
+            pInputText
+            formControlName="categoryId"
+            autocomplete="categoryId"
+         />
+         <label for="categoryId">Kategória ID</label>
+      </span>
+   </div>
+   <p-button
+      id="register-btn"
+      class="text-center col-12 pb-3 md:col-5 md:pb-3"
+      type="submit"
+      label="Kategória törlése"
+   ></p-button>
+</form>
+
+<p-slideMenu [model]="categoryMenuItems" backLabel="Vissza"></p-slideMenu>
+
+<p-treeSelect
+   [(ngModel)]="selectedNodes"
+   selectionMode="multiple"
+   [options]="categoryTreeNode"
+   placeholder="Válassz kategóriákat"
+   selectionMode="checkbox"
+   (ngModelChange)="treeSelect($event)"
+>
+   <!-- <ng-template pTemplate="value" let-node>{{ node.name }}</ng-template> -->
+</p-treeSelect>
+
+<!-- <div class="text-center mb-5"> {{ selectedNodes | json }} </div> -->
+
+<div class="mt-6 text-center">
+   {{ categories | json }}
+</div>

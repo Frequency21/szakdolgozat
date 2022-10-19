@@ -12,9 +12,9 @@ export class CategoryService {
       const newCategory = new Category();
       newCategory.name = createCategoryDto.name;
       if (createCategoryDto.parentCategoryId) {
-         const parent = await this.em
-            .getTreeRepository(Category)
-            .findOneBy({ id: createCategoryDto.parentCategoryId });
+         const parent = await this.em.getTreeRepository(Category).findOneBy({
+            id: createCategoryDto.parentCategoryId,
+         });
          if (!parent) {
             throw new NotFoundException({
                message: 'Not found parent category',
@@ -22,7 +22,7 @@ export class CategoryService {
          }
          newCategory.parentCategory = parent;
       }
-      return this.em.save(newCategory);
+      return this.em.getTreeRepository(Category).save(newCategory);
    }
 
    findAll() {
@@ -38,6 +38,6 @@ export class CategoryService {
    }
 
    remove(id: number) {
-      return `This action removes a #${id} category`;
+      return this.em.getTreeRepository(Category).delete(id);
    }
 }
