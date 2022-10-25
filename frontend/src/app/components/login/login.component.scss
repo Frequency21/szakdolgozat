@@ -16,6 +16,16 @@
     text-align: right;
 }
 
-::ng-deep .p-button-label {
-    text-align: center;
+::ng-deep {
+    .p-button-label {
+        text-align: center;
+    }
+
+    .p-divider-content {
+        font-variant: small-caps;
+    }
+
+    .p-divider.p-divider-horizontal {
+        margin: 0 0 1rem 0;
+    }
 }
