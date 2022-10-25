@@ -32,17 +32,22 @@ export class User {
    @Column({ nullable: true, default: null })
    idp?: string;
 
+   @ApiProperty({
+      example: 'https://cute-hedgehog-photos.com/sanyi.jpg',
+      nullable: true,
+   })
    @Column({ nullable: true, default: null })
    picture?: string;
 
+   @ApiProperty({ enum: Role, default: Role.customer })
    @Column('enum', { enum: Role, default: Role.customer })
    role!: Role;
 
-   @Exclude()
+   @ApiPropertyOptional({ example: 'random UUID' })
    @Column({ nullable: true, default: null })
    barionPosKey?: string;
 
-   @Exclude()
+   @ApiPropertyOptional({ example: 'random email' })
    @Column({ nullable: true, default: null })
    barionEmail?: string;
 
@@ -54,9 +59,11 @@ export class User {
    @OneToMany(() => Product, (product) => product.buyer)
    boughtProducts!: Product[];
 
+   @ApiPropertyOptional({ type: [Message], default: [] })
    @OneToMany(() => Message, (message) => message.sender)
    sentMessages?: Message[];
 
+   @ApiPropertyOptional({ type: [Message], default: [] })
    @OneToMany(() => Message, (message) => message.receiver)
    receivedMessages?: Message[];
 }
