@@ -25,7 +25,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(request).pipe(
          catchError((err: HttpErrorResponse) => {
             if (err.status === HttpStatusCode.Unauthorized) {
-               if (this.auth.loggedIn.value) {
+               if (this.auth.loggedIn) {
                   this.messageService.add({
                      key: 'app',
                      data: [
@@ -35,7 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
                      severity: 'warn',
                      sticky: true,
                   });
-                  this.auth.loggedIn.next(false);
+                  this.auth.deleteSession();
                   return EMPTY;
                }
             }

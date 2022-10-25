@@ -7,22 +7,22 @@ import { User } from '../models/user.model';
    providedIn: 'root',
 })
 export class AuthService {
-   readonly loggedIn = new BehaviorSubject<boolean>(false);
+   private readonly user$$ = new BehaviorSubject<User | null>(null);
 
-   loggedIn$ = this.loggedIn.asObservable();
+   loggedIn$ = this.user$$.pipe(map(user => user != null));
+   user$ = this.user$$.pipe();
 
    constructor(private http: HttpClient) {}
 
+   get loggedIn() {
+      return this.user$$.value != null;
+   }
+
    autoLogin(): void {
-      this.http
-         .get('/api/auth', { observe: 'response' })
-         .pipe(map(resp => resp.ok))
-         .subscribe({
-            next: isAuthenticated => {
-               this.loggedIn.next(isAuthenticated);
-            },
-            error: _error => this.loggedIn.next(false),
-         });
+      this.http.get<User | null>('/api/auth').subscribe({
+         next: user => this.user$$.next(user),
+         error: () => this.user$$.next(null),
+      });
    }
 
    register(
@@ -45,41 +45,32 @@ export class AuthService {
 
    googleSignIn(jwt: string) {
       return this.http
-         .post<User | null>(
-            '/api/auth/google-sign-in',
-            { jwt },
-            { observe: 'response' },
-         )
-         .pipe(
-            tap(resp => {
-               this.loggedIn.next(resp.ok);
-            }),
-            map(resp => resp.body),
-         );
+         .post<User | null>('/api/auth/google-sign-in', { jwt })
+         .pipe(tap(user => this.user$$.next(user)));
    }
 
    login(email: string, password: string): Observable<boolean> {
       return this.http
-         .post(
-            '/api/auth/login',
-            {
-               email,
-               password,
-            },
-            { observe: 'response' },
-         )
+         .post<User | null>('/api/auth/login', {
+            email,
+            password,
+         })
          .pipe(
-            map(resp => resp.ok),
-            tap(loggedIn => this.loggedIn.next(loggedIn)),
+            tap(user => this.user$$.next(user)),
+            map(user => user != null),
          );
+   }
+
+   deleteSession() {
+      // delete storage if any
+      this.user$$.next(null);
    }
 
    logout(): Observable<boolean> {
       return this.http.delete('/api/auth/logout', { observe: 'response' }).pipe(
          map(resp => resp.ok),
          tap({
-            next: loggedOut => this.loggedIn.next(!loggedOut),
-            error: _ => this.loggedIn.next(false),
+            next: loggedOut => loggedOut && this.user$$.next(null),
          }),
       );
    }
