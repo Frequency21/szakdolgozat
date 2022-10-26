@@ -1,20 +1,22 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
+import { FileUploadModule } from 'primeng/fileupload';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TreeSelectModule } from 'primeng/treeselect';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { ProfileComponent } from './profile/profile.component';
 import { UserRoutingModule } from './user-routing.module';
 import { UserComponent } from './user.component';
 
 @NgModule({
-   declarations: [UserComponent],
+   declarations: [UserComponent, ProfileComponent],
    imports: [
-      CommonModule,
+      SharedModule,
       UserRoutingModule,
-      ButtonModule,
-      FormsModule,
-      ReactiveFormsModule,
-      InputTextModule,
+      TreeSelectModule,
+      FileUploadModule,
+      ProgressBarModule,
+      SkeletonModule,
    ],
 })
 export class UserModule {}

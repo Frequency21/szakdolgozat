@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/constants/db/postgresql.error.codes';
 import { Repository } from 'typeorm';
 import { RegisterWithPasswordDto } from './dto/register-with-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { GoogleUser, User } from './entities/user.entity';
 
 @Injectable()
@@ -74,5 +75,16 @@ export class UserService {
          }
          return null;
       }
+   }
+
+   updateUser(updateUserDto: UpdateUserDto) {
+      if (updateUserDto.id == null) {
+         return null;
+      }
+      return this.usersRepository.save(updateUserDto);
+   }
+
+   getAllUser() {
+      return this.usersRepository.find();
    }
 }

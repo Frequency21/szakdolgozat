@@ -12,7 +12,14 @@ async function bootstrap() {
 
    app.use(cookieParser());
    // app.use(helmet());
-   app.useGlobalPipes(new ValidationPipe());
+   app.useGlobalPipes(
+      // TODO: forbidNonWhitelisted false in production
+      new ValidationPipe({
+         transform: true,
+         whitelist: true,
+         forbidNonWhitelisted: true,
+      }),
+   );
    app.setGlobalPrefix('api');
 
    // setup swagger

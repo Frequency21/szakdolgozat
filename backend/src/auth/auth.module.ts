@@ -5,6 +5,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { CookieAuthGuard } from './guards/cookie-auth.guard';
 import { CustomStrategy } from './strategies/custom-strategy';
 import { LocalSerializer } from './strategies/local-serializer';
 import { LocalStrategy } from './strategies/local-strategy';
@@ -16,6 +17,7 @@ import { LocalStrategy } from './strategies/local-strategy';
       LocalStrategy,
       CustomStrategy,
       LocalSerializer,
+      CookieAuthGuard,
       {
          provide: OAuth2Client,
          useFactory: (config: ConfigService) => {
@@ -28,5 +30,6 @@ import { LocalStrategy } from './strategies/local-strategy';
       },
    ],
    controllers: [AuthController],
+   exports: [AuthService, CookieAuthGuard],
 })
 export class AuthModule {}

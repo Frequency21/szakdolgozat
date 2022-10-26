@@ -1,1 +1,187 @@
-<p>profile works!</p>
+<p-skeleton
+   *ngIf="!user; else loaded"
+   class="inline-block"
+   shape="circle"
+   width="100px"
+   height="100px"
+></p-skeleton>
+
+<ng-template #loaded>
+   <img
+      style="
+         max-width: 100px;
+         max-height: 100px;
+         aspect-ratio: 1;
+         border-radius: 100000px;
+         object-fit: cover;
+      "
+      [src]="choosenFile ?? user!.picture"
+   />
+</ng-template>
+<p-fileUpload
+   #fileUpload
+   class="ml-2 mr-2"
+   mode="basic"
+   [customUpload]="true"
+   (uploadHandler)="uploadHandler($event, fileUpload.clear.bind(fileUpload))"
+   (onSelect)="onSelect($event)"
+   [multiple]="false"
+   accept="image/*"
+   [maxFileSize]="1000000"
+>
+</p-fileUpload>
+<button
+   pButton
+   style="width: 50px; height: 50px"
+   class="p-button-danger"
+   icon="pi pi-times"
+   (click)="fileUpload.clear(); choosenFile = undefined"
+></button>
+
+<ng-container [formGroup]="profileData">
+   <h1>Személyes adatok</h1>
+   <div class="mt-3 formgrid grid">
+      <div class="field col-12 md:col-6">
+         <span class="p-float-label"
+            ><input
+               class="w-full"
+               pInputText
+               type="text"
+               formControlName="name"
+               id="name"
+            />
+            <label for="name">Teljes név</label>
+         </span>
+      </div>
+      <div class="field col-12 md:col-6">
+         <span class="p-float-label">
+            <input
+               class="w-full"
+               pInputText
+               type="text"
+               formControlName="email"
+               id="email"
+            />
+            <label for="email">Email</label>
+         </span>
+      </div>
+   </div>
+
+   <h1>Fizetési adatok</h1>
+   <div class="mt-3 formgrid grid">
+      <div class="field col-12 md:col-6">
+         <span class="p-float-label"
+            ><input
+               class="w-full"
+               pInputText
+               type="text"
+               formControlName="barionEmail"
+               id="barionEmail"
+            />
+            <label for="barionEmail">Barion email</label>
+         </span>
+      </div>
+      <div class="field col-12 md:col-6">
+         <span class="p-float-label">
+            <input
+               class="w-full"
+               pInputText
+               type="text"
+               formControlName="barionPosKey"
+               id="barion-poskey"
+            />
+            <label for="barion-poskey">Barion POSKey</label>
+         </span>
+      </div>
+   </div>
+   <p-button
+      class="flex justify-content-center md:justify-content-start"
+      type="button"
+      label="Profil adatok frissítése"
+      [disabled]="disableSubmitBtn"
+      (click)="submitProfileData()"
+   ></p-button>
+</ng-container>
+
+<form
+   id="register-form"
+   class="p-fluid formgrid grid mt-5"
+   [formGroup]="categoryForm"
+   (ngSubmit)="createCategory()"
+>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="categoryName"
+            type="text"
+            pInputText
+            formControlName="categoryName"
+            autocomplete="categoryName"
+         />
+         <label for="categoryName">Kategória neve</label>
+      </span>
+   </div>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="parentCategoryId"
+            type="email"
+            pInputText
+            formControlName="parentCategoryId"
+            autocomplete="parentCategoryId"
+         />
+         <label for="parentCategoryId">Szülő kategória</label>
+      </span>
+   </div>
+   <p-button
+      id="register-btn"
+      class="text-center col-12 pb-3 md:col-5 md:pb-3"
+      type="submit"
+      label="Kategória létrehozása"
+   ></p-button>
+</form>
+
+<form
+   id="register-form"
+   class="p-fluid formgrid grid mt-5"
+   [formGroup]="deleteCategoryForm"
+   (ngSubmit)="deleteCategory()"
+>
+   <div class="field col-3">
+      <span class="p-float-label">
+         <input
+            id="categoryId"
+            type="text"
+            pInputText
+            formControlName="categoryId"
+            autocomplete="categoryId"
+         />
+         <label for="categoryId">Kategória ID</label>
+      </span>
+   </div>
+   <p-button
+      id="register-btn"
+      class="text-center col-12 pb-3 md:col-5 md:pb-3"
+      type="submit"
+      label="Kategória törlése"
+   ></p-button>
+</form>
+
+<p-slideMenu [model]="categoryMenuItems" backLabel="Vissza"></p-slideMenu>
+
+<p-treeSelect
+   [(ngModel)]="selectedNodes"
+   selectionMode="multiple"
+   [options]="categoryTreeNode"
+   placeholder="Válassz kategóriákat"
+   selectionMode="checkbox"
+   (ngModelChange)="treeSelect($event)"
+>
+   <!-- <ng-template pTemplate="value" let-node>{{ node.name }}</ng-template> -->
+</p-treeSelect>
+
+<!-- <div class="text-center mb-5"> {{ selectedNodes | json }} </div> -->
+
+<div class="mt-6 text-center">
+   {{ categories | json }}
+</div>

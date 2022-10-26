@@ -1,0 +1,13 @@
+:host {
+    display: block;
+    padding: 1rem;
+}
+
+:host ::ng-deep .p-fileupload-choose {
+    width: 50px;
+    height: 50px;
+}
+
+p-fileupload {
+    display: inline-block;
+}
