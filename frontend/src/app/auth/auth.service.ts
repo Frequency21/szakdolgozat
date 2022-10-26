@@ -18,6 +18,19 @@ export class AuthService {
       return this.user$$.value != null;
    }
 
+   get user() {
+      return this.user$$.value;
+   }
+
+   set user(user: User | null) {
+      this.user$$.next(user);
+   }
+
+   updateUser(partialUser: Partial<User>) {
+      const currentUser = this.user;
+      this.user$$.next(currentUser ? { ...currentUser, ...partialUser } : null);
+   }
+
    autoLogin(): void {
       this.http.get<User | null>('/api/auth').subscribe({
          next: user => this.user$$.next(user),

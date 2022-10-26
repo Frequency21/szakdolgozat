@@ -114,6 +114,9 @@ export class ProfileComponent implements OnDestroy {
                email: user!.email,
                name: user!.name,
             });
+            if (user!.idp) {
+               this.profileData.controls.email.disable();
+            }
             this.disableSubmitBtn = false;
             return (this.user = user!);
          });
@@ -156,10 +159,16 @@ export class ProfileComponent implements OnDestroy {
                return EMPTY;
             }),
          )
-         .subscribe(() => clearCb());
+         .subscribe(updatedUser => {
+            this.auth.updateUser({
+               picture: updatedUser.picture,
+            });
+            clearCb();
+         });
    }
 
-   /** fájl feltöltése az aws bucketbe */
+   /** fájl feltöltése az aws bucketbe,
+    *  siker esetén a backenden is updateljük a user profile képét */
    uploadFile(file: File, signedRequestUrl: string, url: string) {
       return this.http
          .put(signedRequestUrl, file, {
@@ -167,6 +176,7 @@ export class ProfileComponent implements OnDestroy {
             observe: 'events',
          })
          .pipe(
+            // update profile if aws upload was successful
             concatMap(resp => {
                if (resp.type === HttpEventType.Response && resp.ok) {
                   return this.userService.updateUser({
@@ -198,7 +208,7 @@ export class ProfileComponent implements OnDestroy {
             id: this.user!.id,
          })
          .pipe(finalize(() => (this.disableSubmitBtn = false)))
-         .subscribe();
+         .subscribe(() => this.auth.updateUser({ ...formValue }));
    }
 
    // TODO kategóriás dolgokat törölni

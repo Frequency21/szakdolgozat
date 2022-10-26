@@ -28,7 +28,6 @@ export class User {
    password?: string;
 
    /** Identity provider (in case of OIDC authentication) */
-   @Exclude()
    @Column({ nullable: true, default: null })
    idp?: string;
 

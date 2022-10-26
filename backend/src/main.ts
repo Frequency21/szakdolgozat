@@ -14,7 +14,11 @@ async function bootstrap() {
    // app.use(helmet());
    app.useGlobalPipes(
       // TODO: forbidNonWhitelisted false in production
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+      new ValidationPipe({
+         transform: true,
+         whitelist: true,
+         forbidNonWhitelisted: true,
+      }),
    );
    app.setGlobalPrefix('api');
 

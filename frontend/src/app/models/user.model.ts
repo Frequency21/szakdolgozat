@@ -3,6 +3,7 @@ import { Product } from './product.model';
 export type User = {
    id: number;
    email: string;
+   idp?: string;
    name: string;
    picture?: string;
    barionEmail?: string;
@@ -10,4 +11,5 @@ export type User = {
    products?: Product[];
 };
 
-export type UpdateUserDto = Partial<User> & Pick<User, 'id'>;
+export type UpdateUserDto = Partial<Omit<User, 'idp' | 'password' | 'role'>> &
+   Pick<User, 'id'>;

@@ -28,7 +28,7 @@ export class UserController {
 
    @ApiCreatedResponse({
       type: User,
-      description: 'Updated user',
+      description: 'Update user',
    })
    @Post()
    async updateUser(@Body() updateUserDto: UpdateUserDto) {
@@ -38,7 +38,7 @@ export class UserController {
 
    @ApiOkResponse({
       type: [User],
-      description: 'All users',
+      description: 'Get all users',
    })
    @Get()
    getAllUser() {
