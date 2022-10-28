@@ -62,16 +62,13 @@ export class AuthService {
          .pipe(tap(user => this.user$$.next(user)));
    }
 
-   login(email: string, password: string): Observable<boolean> {
+   login(email: string, password: string): Observable<User | null> {
       return this.http
          .post<User | null>('/api/auth/login', {
             email,
             password,
          })
-         .pipe(
-            tap(user => this.user$$.next(user)),
-            map(user => user != null),
-         );
+         .pipe(tap(user => this.user$$.next(user)));
    }
 
    deleteSession() {
