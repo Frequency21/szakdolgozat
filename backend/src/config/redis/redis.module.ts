@@ -1,7 +1,9 @@
 import { Logger, Module } from '@nestjs/common';
+import RedisStore from 'connect-redis';
+import session from 'express-session';
 import { env } from 'process';
 import { createClient } from 'redis';
-import { REDIS } from './redis.conts';
+import { REDIS, SESSION_STORE } from './redis.conts';
 
 @Module({
    providers: [
@@ -45,7 +47,17 @@ import { REDIS } from './redis.conts';
             return redisClient;
          },
       },
+      {
+         provide: SESSION_STORE,
+         useFactory: (redisClient: any) => {
+            return new (RedisStore(session))({
+               client: redisClient as any,
+               logErrors: true,
+            });
+         },
+         inject: [REDIS],
+      },
    ],
-   exports: [REDIS],
+   exports: [REDIS, SESSION_STORE],
 })
 export class RedisModule {}

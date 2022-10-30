@@ -6,6 +6,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CookieAuthGuard } from './guards/cookie-auth.guard';
+import { WsCookieAuthGuard } from './guards/ws-cookie-auth.guard';
 import { CustomStrategy } from './strategies/custom-strategy';
 import { LocalSerializer } from './strategies/local-serializer';
 import { LocalStrategy } from './strategies/local-strategy';
@@ -18,6 +19,7 @@ import { LocalStrategy } from './strategies/local-strategy';
       CustomStrategy,
       LocalSerializer,
       CookieAuthGuard,
+      WsCookieAuthGuard,
       {
          provide: OAuth2Client,
          useFactory: (config: ConfigService) => {

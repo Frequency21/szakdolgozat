@@ -2,8 +2,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import { env } from 'process';
+import session from 'express-session';
+import passport from 'passport';
+import { env, exit } from 'process';
+import { SessionAdapter } from './adapters/session-adapter';
 import { AppModule } from './app.module';
+import { REDIS, SESSION_STORE } from './config/redis/redis.conts';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule, {
@@ -40,6 +44,34 @@ async function bootstrap() {
          plugins: [],
       },
    });
+
+   const redisClient = app.get(REDIS);
+   try {
+      await redisClient.connect();
+   } catch (err) {
+      Logger.error(
+         "Couldn't connect to Redis. Application shutdown",
+         'Redis Client',
+      );
+      exit(1);
+   }
+
+   // REFERENCE: http://expressjs.com/en/resources/middleware/session.html
+   const store = app.get(SESSION_STORE);
+   const sessionMiddleware = session({
+      store,
+      secret: env.SESSION_SECRET || 'topsecret',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+         sameSite: true,
+         httpOnly: env.SSL ? (env.SSL === 'true' ? true : false) : true,
+         maxAge: 86400000,
+      },
+   });
+
+   app.use(sessionMiddleware, passport.initialize(), passport.session());
+   app.useWebSocketAdapter(new SessionAdapter(app, sessionMiddleware));
 
    Logger.log(
       `Server is listening on port ${process.env.PORT || 3000}`,

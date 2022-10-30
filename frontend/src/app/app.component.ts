@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { combineLatest, map, Observable, ReplaySubject, takeUntil } from 'rxjs';
@@ -9,13 +9,14 @@ import {
    CategoryService,
    deepCloneTree,
 } from './shared/services/category.service';
+import { WebsocketService } from './shared/services/websocket.service';
 
 @Component({
    selector: 'app-root',
    templateUrl: './app.component.html',
    styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
    private destroyed$ = new ReplaySubject<void>();
 
    loggedIn!: boolean;
@@ -43,6 +44,10 @@ export class AppComponent implements OnInit, OnDestroy {
       this.items$ = combineLatest([loggedIn$, categories$]).pipe(
          map(args => this.getMenuItems(...args)),
       );
+   }
+
+   ngAfterViewChecked(): void {
+      console.log('After view checked');
    }
 
    ngOnInit(): void {

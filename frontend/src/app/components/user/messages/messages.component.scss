@@ -1,0 +1,23 @@
+:host {
+    display: flex;
+    flex-flow: row nowrap;
+    flex: 1 0;
+
+    > * {
+        flex: 0 0;
+        display: flex;
+        flex-flow: column nowrap;
+        align-content: stretch;
+    }
+}
+
+.contact-list {
+    flex-basis: 400px;
+    > * {
+        padding-block: 16px;
+    }
+}
+
+.message-panel {
+    flex: 1 0;
+}
