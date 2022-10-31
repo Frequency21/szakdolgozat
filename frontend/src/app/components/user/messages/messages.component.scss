@@ -4,20 +4,83 @@
     flex: 1 0;
 
     > * {
-        flex: 0 0;
         display: flex;
+        max-height: calc(var(--vhc) * 100);
+        overflow: auto;
+
+        flex: 0 0;
         flex-flow: column nowrap;
         align-content: stretch;
     }
 }
 
 .contact-list {
-    flex-basis: 400px;
+    flex-basis: 150px;
+
+    @media screen and (min-width: 1000px) {
+        flex-basis: 200px;
+    }
+
     > * {
+        cursor: pointer;
         padding-block: 16px;
+        padding-left: 16px;
+        &:hover {
+            background-color: rgba(128, 128, 128, 0.31);
+        }
+    }
+
+    .active {
+        background-color: rgba(128, 128, 128, 0.31);
     }
 }
 
-.message-panel {
+.messages {
+    display: flex;
+    flex-flow: column nowrap;
     flex: 1 0;
+    padding-inline: 16px;
+    padding-top: 16px;
+
+    &__container {
+        flex: 1 0;
+        display: flex;
+        flex-flow: column nowrap;
+    }
+
+    &__control-panel {
+        flex: 0 0;
+        display: flex;
+        flex-flow: row nowrap;
+        position: sticky;
+        bottom: -1px;
+        padding-block: 16px;
+        background-color: white;
+
+        textarea {
+            flex: 1 0;
+            margin-right: 16px;
+        }
+
+        button {
+            flex: 0 0 auto;
+        }
+    }
+}
+
+.message {
+    display: inline-block;
+    max-width: 80%;
+    padding: 10px;
+    background-color: rgb(181, 181, 181);
+    color: white;
+
+    border-radius: 16px;
+
+    &--self {
+        @extend .message;
+        float: right;
+        background-color: #3b82f6;
+        color: white;
+    }
 }

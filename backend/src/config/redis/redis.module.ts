@@ -3,7 +3,7 @@ import RedisStore from 'connect-redis';
 import session from 'express-session';
 import { env } from 'process';
 import { createClient } from 'redis';
-import { REDIS, SESSION_STORE } from './redis.conts';
+import { REDIS, SESSION_STORE } from './redis.const';
 
 @Module({
    providers: [

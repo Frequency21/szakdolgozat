@@ -2,7 +2,7 @@ import { INestApplicationContext, Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RequestHandler } from 'express';
 import passport from 'passport';
-import { SessionStore, SESSION_STORE } from 'src/config/redis/redis.conts';
+import { SessionStore, SESSION_STORE } from 'src/config/redis/redis.const';
 
 export class SessionAdapter extends IoAdapter {
    private readonly logger = new Logger(SessionAdapter.name);

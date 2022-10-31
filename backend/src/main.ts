@@ -7,7 +7,7 @@ import passport from 'passport';
 import { env, exit } from 'process';
 import { SessionAdapter } from './adapters/session-adapter';
 import { AppModule } from './app.module';
-import { REDIS, SESSION_STORE } from './config/redis/redis.conts';
+import { REDIS, SESSION_STORE } from './config/redis/redis.const';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule, {
