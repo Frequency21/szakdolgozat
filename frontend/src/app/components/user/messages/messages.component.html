@@ -1,0 +1,81 @@
+<div class="contact-list">
+   <div
+      *ngFor="let user of users"
+      (click)="selectUser(user.id)"
+      [ngClass]="user.id === selectedUserId ? 'active' : ''"
+      ><i class="pi pi-user"></i> {{ user.name }}</div
+   >
+</div>
+
+<div #messagePanel class="messages">
+   <ng-container *ngIf="selectedUserId !== undefined">
+      <div class="messages__container">
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div
+            ><span class="message--self"
+               >Árvíztűrő tükörfúrógép Árvíztűrő tükörfúrógép Árvíztűrő
+               tükörfúrógép Árvíztűrő tükörfúrógép Árvíztűrő tükörfúrógép</span
+            ></div
+         >
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+         <div><span class="message">Hello, how are u?</span></div>
+         <div><span class="message--self">I'm fine, and u?</span></div>
+         <div><span class="message">Thanks, im okay</span></div>
+         <div><span class="message--self">Árvíztűrő tükörfúrógép</span></div>
+      </div>
+      <div class="messages__control-panel">
+         <textarea pInputTextarea rows="1"></textarea>
+         <button
+            pButton
+            class="p-button-rounded"
+            icon="pi pi-send"
+            iconPos="left"
+         ></button>
+      </div>
+   </ng-container>
+</div>

@@ -1,12 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
+    min-height: calc(var(--vh) * 100);
+    max-height: calc(var(--vh) * 100);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+app-root {
+    display: block;
+    height: 100%;
+}
+
+.app-content {
+    min-height: calc(var(--vhc) * 100);
+    max-height: calc(var(--vhc) * 100);
 }
 
 .clearfix::after {
-    content: '';
+    content: "";
     clear: both;
     display: table;
+}
+
+@media screen and (hover: hover) {
+    ::-webkit-scrollbar-track {
+        border-radius: 100px;
+        background-color: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        background-color: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 100px;
+        -webkit-box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+        background-color: var(--blue-500);
+    }
 }

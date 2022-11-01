@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+   UntypedFormBuilder,
+   UntypedFormGroup,
+   Validators,
+} from '@angular/forms';
+import { WebsocketService } from 'src/app/shared/services/websocket.service';
 import { UserService } from './user.service';
 
 @Component({
@@ -12,8 +17,12 @@ export class UserComponent {
 
    response?: string | null;
 
-   constructor(private fb: UntypedFormBuilder, private userService: UserService) {
+   constructor(
+      private fb: UntypedFormBuilder,
+      private userService: UserService,
+   ) {
       this.form = this.fb.group({
+         receiverId: this.fb.control('', [Validators.required]),
          msg: this.fb.control('', [Validators.required]),
       });
    }

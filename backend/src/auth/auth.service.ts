@@ -5,6 +5,7 @@ import {
    UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { OAuth2Client } from 'google-auth-library';
@@ -19,6 +20,7 @@ export class AuthService {
       private readonly usersService: UserService,
       private oauthClient: OAuth2Client,
       private configService: ConfigService,
+      private eventEmitter: EventEmitter2,
    ) {}
 
    public async register(registrationData: RegisterWithPasswordDto) {
@@ -77,6 +79,10 @@ export class AuthService {
    }
 
    public logout(request: Request) {
+      this.eventEmitter.emit('authentication.logout', {
+         sessionId: request.session.id,
+         userId: request.user?.id,
+      });
       request.logOut({ keepSessionInfo: false }, (err) => {
          Logger.error(
             err?.toString() ?? 'Error while trying to destroy session info',

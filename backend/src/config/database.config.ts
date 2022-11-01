@@ -15,7 +15,7 @@ export default registerAs(
          type: 'postgres',
          entities: ['dist/**/*.entity.js'],
          synchronize: true,
-         dropSchema: true,
+         dropSchema: false,
          autoLoadEntities: true,
          extra: {
             ssl: {
@@ -31,7 +31,7 @@ export default registerAs(
          password: env.DATABASE_PASSWORD,
          database: env.DATABASE_NAME,
          entities: ['dist/**/*.entity.js'],
-         dropSchema: true,
+         dropSchema: false,
          synchronize: true,
          autoLoadEntities: true,
       },

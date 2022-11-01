@@ -1,32 +1,34 @@
 import { Logger, Module } from '@nestjs/common';
+import RedisStore from 'connect-redis';
+import session from 'express-session';
+import Redis, { RedisOptions } from 'ioredis';
 import { env } from 'process';
-import { createClient } from 'redis';
-import { REDIS } from './redis.conts';
+import { REDIS, SESSION_STORE } from './redis.const';
 
 @Module({
    providers: [
       {
          provide: REDIS,
          useFactory: () => {
-            const redisClient = createClient({
-               url: env.REDIS_TLS_URL,
-               socket: {
-                  tls: true,
+            const redisClient = new Redis(env.REDIS_TLS_URL!, {
+               tls: {
                   rejectUnauthorized: false,
-                  reconnectStrategy: (retries: number) => {
-                     retries = retries + 1;
-                     const nextRetry = retries > 4 ? 30 : retries * 5;
-                     Logger.error(
-                        `(${retries}) ...retry after ${nextRetry} seconds.`,
-                        'Redis Connection',
-                     );
-                     if (retries > 10)
-                        return new Error("Couldn't connect to Redis Client.");
-                     return nextRetry * 1000;
-                  },
                },
-               legacyMode: true,
-            });
+               reconnectOnError: (err) => {
+                  Logger.error(`Error during redis connection ${err}`);
+                  return 1;
+               },
+               retryStrategy(retries) {
+                  const nextRetry = retries > 4 ? 30 : retries * 5;
+                  Logger.error(
+                     `(${retries}) ...retry after ${nextRetry} seconds.`,
+                     'Redis Connection',
+                  );
+                  if (retries > 10)
+                     return new Error("Couldn't connect to Redis Client.");
+                  return nextRetry * 1000;
+               },
+            } as RedisOptions);
 
             redisClient.on('error', function (err) {
                Logger.error(
@@ -45,7 +47,17 @@ import { REDIS } from './redis.conts';
             return redisClient;
          },
       },
+      {
+         provide: SESSION_STORE,
+         useFactory: (redisClient: Redis) => {
+            return new (RedisStore(session))({
+               client: redisClient,
+               logErrors: true,
+            });
+         },
+         inject: [REDIS],
+      },
    ],
-   exports: [REDIS],
+   exports: [REDIS, SESSION_STORE],
 })
 export class RedisModule {}

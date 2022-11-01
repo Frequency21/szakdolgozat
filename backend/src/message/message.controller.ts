@@ -22,7 +22,7 @@ export class MessageController {
 
    @Post()
    create(@Body() createMessageDto: CreateMessageDto) {
-      return this.messageService.create(createMessageDto);
+      return this.messageService.create(0, createMessageDto);
    }
 
    @Get()

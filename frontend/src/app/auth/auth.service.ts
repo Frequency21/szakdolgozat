@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
+import { WebsocketService } from '../shared/services/websocket.service';
 
 @Injectable({
    providedIn: 'root',
@@ -12,7 +13,10 @@ export class AuthService {
    loggedIn$ = this.user$$.pipe(map(user => user != null));
    user$ = this.user$$.pipe();
 
-   constructor(private http: HttpClient) {}
+   constructor(
+      private http: HttpClient,
+      private websocketService: WebsocketService,
+   ) {}
 
    get loggedIn() {
       return this.user$$.value != null;
@@ -33,7 +37,9 @@ export class AuthService {
 
    autoLogin(): void {
       this.http.get<User | null>('/api/auth').subscribe({
-         next: user => this.user$$.next(user),
+         next: user => {
+            return this.user$$.next(user);
+         },
          error: () => this.user$$.next(null),
       });
    }
@@ -62,16 +68,13 @@ export class AuthService {
          .pipe(tap(user => this.user$$.next(user)));
    }
 
-   login(email: string, password: string): Observable<boolean> {
+   login(email: string, password: string): Observable<User | null> {
       return this.http
          .post<User | null>('/api/auth/login', {
             email,
             password,
          })
-         .pipe(
-            tap(user => this.user$$.next(user)),
-            map(user => user != null),
-         );
+         .pipe(tap(user => this.user$$.next(user)));
    }
 
    deleteSession() {

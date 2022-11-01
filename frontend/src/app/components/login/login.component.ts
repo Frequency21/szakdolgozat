@@ -8,6 +8,7 @@ import {
 import { Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Role, User } from 'src/app/models/user.model';
 import { environment } from 'src/environments/environment';
 
 // will be defined by google client script
@@ -47,7 +48,7 @@ export class LoginComponent implements OnInit {
       gsiClient.onload = () => {
          google.accounts.id.initialize({
             client_id: environment.googleClientId,
-            callback: this.handleCredentialResponse.bind(this),
+            callback: this.handleCredentialResponse,
          });
          google.accounts.id.renderButton(
             document.getElementById('google-sign-in-btn'),
@@ -61,17 +62,29 @@ export class LoginComponent implements OnInit {
       this.renderer.appendChild(this.doc.body, gsiClient);
    }
 
-   handleCredentialResponse(response: any) {
+   handleCredentialResponse = (response: any) => {
       this.ngZone.run(() => {
-         this.auth.googleSignIn(response.credential).subscribe();
+         this.auth
+            .googleSignIn(response.credential)
+            .subscribe(this.handleLogin);
       });
-   }
+   };
 
    onSubmit(): void {
       this.auth
          .login(this.loginForm.value['email'], this.loginForm.value['password'])
-         .subscribe(resp => console.log(resp));
+         .subscribe(this.handleLogin);
    }
+
+   handleLogin = (user: User | null) => {
+      if (!user) {
+         return;
+      }
+
+      this.router.navigateByUrl(
+         user.role === Role.customer ? '/users/profile' : '/admin',
+      );
+   };
 
    onRegister(): void {
       this.router.navigateByUrl('/register');
