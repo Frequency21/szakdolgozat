@@ -4,10 +4,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
-import { env, exit } from 'process';
+import { env } from 'process';
 import { SessionAdapter } from './adapters/session-adapter';
 import { AppModule } from './app.module';
-import { REDIS, SESSION_STORE } from './config/redis/redis.const';
+import { SESSION_STORE } from './config/redis/redis.const';
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule, {
@@ -44,17 +44,6 @@ async function bootstrap() {
          plugins: [],
       },
    });
-
-   const redisClient = app.get(REDIS);
-   try {
-      await redisClient.connect();
-   } catch (err) {
-      Logger.error(
-         "Couldn't connect to Redis. Application shutdown",
-         'Redis Client',
-      );
-      exit(1);
-   }
 
    // REFERENCE: http://expressjs.com/en/resources/middleware/session.html
    const store = app.get(SESSION_STORE);

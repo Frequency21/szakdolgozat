@@ -64,29 +64,6 @@ export class WsMessagesGateway implements OnGatewayConnection {
          `handling logout with payload ${JSON.stringify(payload)}`,
       );
       this.server.to(payload.sessionId).disconnectSockets();
-      this.sessionStore.get(payload.sessionId, (err, session: any) => {
-         if (err) {
-            this.logger.debug(
-               `error while fetching session with session id ${JSON.stringify(
-                  payload.sessionId,
-               )}`,
-            );
-            return;
-         }
-         this.logger.debug(`got session ${JSON.stringify(session)}`);
-         session.online = false;
-         session.save((err) => {
-            if (err) {
-               this.logger.debug(`error during session save`);
-               return;
-            }
-            this.logger.debug(`saved session ${JSON.stringify(session)}`);
-         });
-      });
-
-      this.sessionStore.all?.((err, sessions) => {
-         this.logger.debug(`All sessions: ${JSON.stringify(sessions)}`);
-      });
    }
 
    @UseGuards(WsCookieAuthGuard)
