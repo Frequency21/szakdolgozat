@@ -24,8 +24,5 @@
   "bugs": {
     "url": "https://github.com/Frequency21/szakdolgozat/issues"
   },
-  "homepage": "https://github.com/Frequency21/szakdolgozat#readme",
-  "devDependencies": {
-    "husky": "^7.0.4"
-  }
+  "homepage": "https://github.com/Frequency21/szakdolgozat#readme"
 }

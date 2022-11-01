@@ -146,13 +146,13 @@ export class ProfileComponent implements OnDestroy {
       }
 
       this.aws
-         .getSignedUrl(file.name, file.type)
+         .getSignedUrl()
          .pipe(
             switchMap(resp => {
                if (resp.ok && resp.body) {
                   return this.uploadFile(
                      file,
-                     resp.body.signedRequest,
+                     resp.body.signedUrl,
                      resp.body.url,
                   );
                }
@@ -169,9 +169,9 @@ export class ProfileComponent implements OnDestroy {
 
    /** fájl feltöltése az aws bucketbe,
     *  siker esetén a backenden is updateljük a user profile képét */
-   uploadFile(file: File, signedRequestUrl: string, url: string) {
+   uploadFile(file: File, signedRequest: string, url: string) {
       return this.http
-         .put(signedRequestUrl, file, {
+         .put(signedRequest, file, {
             reportProgress: true,
             observe: 'events',
          })

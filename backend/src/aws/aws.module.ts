@@ -1,18 +1,20 @@
+import { S3Client } from '@aws-sdk/client-s3';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import AWS from 'aws-sdk';
-import { AWS_S3 } from 'src/aws/aws.const';
+import { AuthModule } from 'src/auth/auth.module';
+import { S3_CLIENT } from 'src/aws/aws.const';
 import { AwsController } from './aws.controller';
 
 @Module({
-   imports: [ConfigModule],
+   imports: [ConfigModule, AuthModule],
    controllers: [AwsController],
    providers: [
       {
-         provide: AWS_S3,
+         provide: S3_CLIENT,
          useFactory: () => {
-            AWS.config.region = 'eu-central-1';
-            return new AWS.S3({ apiVersion: '2006-03-01' });
+            return new S3Client({
+               region: 'eu-central-1',
+            });
          },
       },
    ],

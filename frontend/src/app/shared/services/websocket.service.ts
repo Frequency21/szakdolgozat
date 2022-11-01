@@ -17,7 +17,7 @@ export class WebsocketService {
       if (this.mainSocket) {
          this.mainSocket.disconnect();
       }
-      this.mainSocket = io('http://localhost:3000/messages', {
+      this.mainSocket = io('/api/messages', {
          withCredentials: true,
       });
 

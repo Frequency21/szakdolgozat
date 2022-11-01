@@ -1,1 +1,1 @@
-export const AWS_S3 = 'AWS_S3';
+export const S3_CLIENT = 'S3_CLIENT';

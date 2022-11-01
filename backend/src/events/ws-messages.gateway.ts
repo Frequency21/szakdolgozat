@@ -8,7 +8,6 @@ import {
    WebSocketServer,
    WsResponse,
 } from '@nestjs/websockets';
-import { User } from 'aws-sdk/clients/appstream';
 import { env } from 'process';
 import { from, Observable, of } from 'rxjs';
 import { concatMap, delay, map } from 'rxjs/operators';
@@ -18,6 +17,7 @@ import { SessionStore, SESSION_STORE } from 'src/config/redis/redis.const';
 import { MessageService } from 'src/message/message.service';
 import { WsSession } from 'src/shared/decorators/ws-session.decorators';
 import { WsUser } from 'src/shared/decorators/ws-user.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 // REFERENCIA: https://stackoverflow.com/a/74253785/19302002
 @WebSocketGateway({

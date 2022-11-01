@@ -3,6 +3,13 @@
     "target": "http://localhost:3000",
     "secure": false,
     "changeOrigin": false,
-    "logLevel": "debug"
+    "logLevel": "info"
+  },
+
+  "/socket.io": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": false,
+    "logLevel": "info"
   }
 }
