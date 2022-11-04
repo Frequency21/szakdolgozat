@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
-import { WebsocketService } from '../shared/services/websocket.service';
 
 @Injectable({
    providedIn: 'root',
@@ -13,10 +12,7 @@ export class AuthService {
    loggedIn$ = this.user$$.pipe(map(user => user != null));
    user$ = this.user$$.pipe();
 
-   constructor(
-      private http: HttpClient,
-      private websocketService: WebsocketService,
-   ) {}
+   constructor(private http: HttpClient) {}
 
    get loggedIn() {
       return this.user$$.value != null;

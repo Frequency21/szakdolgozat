@@ -6,6 +6,7 @@
     > * {
         display: flex;
         max-height: calc(var(--vhc) * 100);
+        height: calc(var(--vhc) * 100);
         overflow: auto;
 
         flex: 0 0;
@@ -22,11 +23,17 @@
     }
 
     > * {
+        display: flex;
+        align-items: center;
         cursor: pointer;
         padding-block: 16px;
         padding-left: 16px;
         &:hover {
             background-color: rgba(128, 128, 128, 0.31);
+        }
+
+        img {
+            margin-right: 6px;
         }
     }
 
@@ -46,6 +53,7 @@
         flex: 1 0;
         display: flex;
         flex-flow: column nowrap;
+        justify-content: flex-end;
     }
 
     &__control-panel {
@@ -74,6 +82,8 @@
     padding: 10px;
     background-color: rgb(181, 181, 181);
     color: white;
+    word-break: break-all;
+    white-space: pre-line;
 
     border-radius: 16px;
 
