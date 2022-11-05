@@ -31,6 +31,7 @@ import {
    CategoryService,
    deepCloneTree,
 } from './shared/services/category.service';
+import { WebsocketService } from './shared/services/websocket.service';
 
 @Component({
    selector: 'app-root',
@@ -106,6 +107,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
       private router: Router,
       private http: HttpClient,
       private ngZone: NgZone,
+      private websocketService: WebsocketService,
    ) {
       this.ngZone.runOutsideAngular(() => {
          combineLatest({
@@ -134,7 +136,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
    }
 
    ngAfterViewChecked(): void {
-      console.log('After view checked');
+      console.warn('After view checked');
    }
 
    ngOnInit(): void {

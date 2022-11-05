@@ -15,7 +15,7 @@
       "plugins": ["@typescript-eslint"],
       "rules": {
         // typescript rules
-        "curly": "error",
+        "curly": "off",
 
         "@angular-eslint/directive-selector": [
           "error",

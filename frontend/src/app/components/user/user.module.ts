@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { BadgeModule } from 'primeng/badge';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -18,6 +19,7 @@ import { UserComponent } from './user.component';
       FileUploadModule,
       ProgressBarModule,
       SkeletonModule,
+      BadgeModule,
    ],
 })
 export class UserModule {}

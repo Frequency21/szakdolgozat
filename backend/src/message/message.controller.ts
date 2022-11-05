@@ -5,11 +5,17 @@ import {
    Delete,
    Get,
    Param,
+   ParseIntPipe,
    Patch,
    Post,
+   UseGuards,
    UseInterceptors,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
+import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
+import { CurrentUser } from 'src/shared/decorators/user.decorator';
+import { User } from 'src/user/entities/user.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageService } from './message.service';
@@ -18,21 +24,43 @@ import { MessageService } from './message.service';
 @Controller('message')
 @UseInterceptors(ClassSerializerInterceptor)
 export class MessageController {
-   constructor(private readonly messageService: MessageService) {}
+   constructor(
+      private readonly messageService: MessageService,
+      private eventEmitter: EventEmitter2,
+   ) {}
 
-   @Post()
-   create(@Body() createMessageDto: CreateMessageDto) {
-      return this.messageService.create(0, createMessageDto);
+   @Post(':id')
+   async create(
+      @Param('id', ParseIntPipe) to: number,
+      @Body() createMessageDto: CreateMessageDto,
+      @CurrentUser() user: User,
+   ) {
+      const message = this.messageService.create(
+         user.id,
+         to,
+         createMessageDto.text,
+      );
+      const eventPayload: SentMessagePayload = {
+         from: user.id,
+         to,
+         text: createMessageDto.text,
+      };
+      this.eventEmitter.emit(SENT_MESSAGE_EVENT, eventPayload);
+      return message;
    }
 
    @Get()
-   findAll() {
+   async findAll() {
       return this.messageService.findAll();
    }
 
+   @UseGuards(CookieAuthGuard)
    @Get(':id')
-   findOne(@Param('id') id: string) {
-      return this.messageService.findOne(+id);
+   findMessagesFrom(
+      @Param('id', ParseIntPipe) from: number,
+      @CurrentUser() user: User,
+   ) {
+      return this.messageService.findMessagesFrom(from, user.id);
    }
 
    @Patch(':id')
@@ -45,3 +73,6 @@ export class MessageController {
       return this.messageService.remove(+id);
    }
 }
+
+export const SENT_MESSAGE_EVENT = 'sent_message';
+export type SentMessagePayload = { text: string; from: number; to: number };

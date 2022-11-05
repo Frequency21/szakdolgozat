@@ -45,3 +45,11 @@ app-root {
         background-color: var(--blue-500);
     }
 }
+
+.avatar-mini {
+    max-width: 40px;
+    max-height: 40px;
+    aspect-ratio: 1;
+    border-radius: 100000px;
+    object-fit: cover;
+}

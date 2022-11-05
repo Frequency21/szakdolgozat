@@ -79,8 +79,7 @@ export class AuthService {
    }
 
    public logout(request: Request) {
-      this.eventEmitter.emit('authentication.logout', {
-         sessionId: request.session.id,
+      this.eventEmitter.emit(LOGOUT_EVENT, {
          userId: request.user?.id,
       });
       request.logOut({ keepSessionInfo: false }, (err) => {
@@ -92,3 +91,6 @@ export class AuthService {
       request.session.cookie.maxAge = 0;
    }
 }
+
+export const LOGOUT_EVENT = 'authentication.logout';
+export type LogoutPayload = { userId?: number };
