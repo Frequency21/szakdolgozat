@@ -8,6 +8,7 @@ import { ChipsModule } from 'primeng/chips';
 import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { FileUploadModule } from 'primeng/fileupload';
+import { GalleriaModule } from 'primeng/galleria';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,6 +43,7 @@ const SHARED_MODULES = [
    CalendarModule,
    InputNumberModule,
    MultiSelectModule,
+   GalleriaModule,
 ];
 
 @NgModule({

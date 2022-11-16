@@ -176,6 +176,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
             ({
                label: c.name,
                items: c.subCategories.length > 0 ? [] : undefined,
+               // levelél kategóriáknál navigáció
+               ...(c.subCategories.length > 0
+                  ? {}
+                  : {
+                       command: () => {
+                          this.router.navigate(['categories', c.id]);
+                       },
+                    }),
             } as MenuItem),
          'items',
          true,

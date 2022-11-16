@@ -1,6 +1,7 @@
 <h1>Hírdetés feladása</h1>
 
-<div class="mt-5 p-fluid formgrid grid" [formGroup]="productForm">
+<div class="mt-5 p-fluid formgrid grid form-big-skip" [formGroup]="productForm">
+   <input type="hidden" formControlName="sellerId" />
    <div class="field col-12">
       <span class="p-float-label"
          ><input formControlName="name" pInputText type="text" id="name" />

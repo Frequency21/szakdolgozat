@@ -52,7 +52,7 @@ export class CreateProductComponent implements OnDestroy {
       deliveryOptions: [[] as Delivery[], [Validators.required]],
       weight: [null as number | null],
       // hidden input field, authServicetől fetchelt userId-val töltjük fel
-      sellerId: [null as number | null],
+      sellerId: [null as number | null, [Validators.required]],
    });
 
    displayCondition: Record<Condition, string> = {
@@ -139,11 +139,20 @@ export class CreateProductComponent implements OnDestroy {
    }
 
    myUploader(event: { files: File[] }) {
-      // console.log(event);
       this.chosenFiles = event.files;
-      // this.awsService
-      //    .getSignedUrls(event.files.map(f => f.name))
-      //    .subscribe(() => {});
+      const expiration = this.productForm.value.expiration
+         ? new Date(this.productForm.value.expiration)
+         : undefined;
+
+      if (expiration) {
+         const offset = expiration.getTimezoneOffset();
+
+         if (offset > 0) {
+            expiration.setUTCHours(0, 0, 0, 0);
+         } else {
+            expiration.setUTCHours(24, 0, 0, 0);
+         }
+      }
 
       const createProductDto: CreateProductDto = {
          categoryId: this.productForm.value.categoryId!,
@@ -156,17 +165,17 @@ export class CreateProductComponent implements OnDestroy {
          price: this.productForm.value.price!,
          properties: transformProperties(this.productForm.value.properties!),
          sellerId: this.productForm.value.sellerId!,
-         expiration: this.productForm.value.expiration ?? undefined,
+         expiration: expiration ?? undefined,
          minBid: this.productForm.value.minBid ?? undefined,
          minPrice: this.productForm.value.minPrice ?? undefined,
          weight: this.productForm.value.weight ?? undefined,
       };
 
-      // console.log(createProductDto);
       this.productService
          .createProduct(createProductDto)
          .pipe(
             concatMap(fileUploadData => {
+               this.fileUploadComp.clear();
                this.productForm.reset({});
                return forkJoin(
                   fileUploadData.map(fileUpload => {
@@ -206,12 +215,13 @@ export class CreateProductComponent implements OnDestroy {
          });
 
          this.selectedCategoryProperties = Object.entries(category.properties);
-         this.selectedCategoryProperties.forEach(([k]) => {
+         this.selectedCategoryProperties.forEach(([k, v]) => {
             this.productForm.controls.properties.addControl(
                k,
-               this.fb.control(null as string | string[] | null, [
-                  Validators.required,
-               ]),
+               this.fb.control(
+                  v.multi ? [] : (null as string | string[] | null),
+                  [Validators.required],
+               ),
             );
          });
       });
@@ -252,7 +262,7 @@ function transformProperties(
             k,
             {
                multi: false,
-               values: [v],
+               values: v == null ? [] : [v],
             },
          ];
       }),

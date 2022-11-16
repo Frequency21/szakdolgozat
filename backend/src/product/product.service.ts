@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsService } from 'src/aws/aws.service';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { FindProductDto } from './dto/find-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 
@@ -22,7 +24,7 @@ export class ProductService {
          createProductDto.pictures,
       );
 
-      createProductDto.pictures.map((fileName) => {
+      createProductDto.pictures = createProductDto.pictures.map((fileName) => {
          const signedUrl = signedUrls.find(
             (signedUrl) => signedUrl.name === fileName,
          );
@@ -39,12 +41,69 @@ export class ProductService {
       return signedUrls;
    }
 
-   findAll() {
-      return `This action returns all product`;
+   findAll(categoryId?: number) {
+      return this.productRepo.find({
+         select: {
+            id: true,
+            name: true,
+            seller: {
+               id: true,
+               name: true,
+            },
+            price: true,
+            pictures: true,
+            condition: true,
+            expiration: true,
+            isAuction: true,
+         },
+         where: {
+            ...(categoryId == null ? {} : { categoryId }),
+         },
+         relations: ['seller'],
+      });
    }
 
    findOne(id: number) {
-      return `This action returns a #${id} product`;
+      return this.productRepo.findOneOrFail({
+         where: {
+            id,
+         },
+         relations: { seller: true },
+      });
+   }
+
+   findWhere(findProductDto: FindProductDto): Promise<Product[]> {
+      const sql = this.productRepo
+         .createQueryBuilder('p')
+         // .select('*')
+         .leftJoinAndMapOne('p.seller', User, 'u', 'u.id = p.sellerId')
+         .where('p.properties @> :props::jsonb', {
+            props: findProductDto.properties,
+         })
+         // .where('p.properties @> :props::jsonb', {
+         //    props: {
+         //       szín: {
+         //          multi: true,
+         //          values: ['fehér'],
+         //       },
+         //       háziasított: {
+         //          multi: false,
+         //          values: [],
+         //       },
+         //       aktivitás: {
+         //          multi: false,
+         //          values: [],
+         //       },
+         //    },
+         // })
+         .andWhere('p.categoryId = :categoryId', {
+            categoryId: findProductDto.categoryId,
+         });
+
+      // console.log(sql.getQueryAndParameters());
+      console.log(JSON.stringify(sql.getQueryAndParameters(), null, 4));
+
+      return sql.getMany();
    }
 
    update(id: number, updateProductDto: UpdateProductDto) {

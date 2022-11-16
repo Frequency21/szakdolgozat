@@ -9,6 +9,7 @@ import {
    Entity,
    Index,
    JoinColumn,
+   ManyToMany,
    ManyToOne,
    PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -96,9 +97,9 @@ export class Product {
    @Column({ name: 'buyerId', nullable: true })
    buyerId?: number;
 
-   @ApiProperty({ type: () => User })
-   @ManyToOne(() => User, (user) => user.basket)
-   basketOwner?: User;
+   @ApiProperty({ type: () => [User] })
+   @ManyToMany(() => User, (user) => user.baskets)
+   basketOwners?: User[];
 
    @ApiProperty({ type: () => Category })
    @ManyToOne(() => Category, (category) => category.products)

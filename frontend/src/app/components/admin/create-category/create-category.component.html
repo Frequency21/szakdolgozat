@@ -1,7 +1,6 @@
 <form [formGroup]="createCategoryForm" (ngSubmit)="onSubmit()">
    <input type="hidden" formControlName="parentId" />
-   <input type="hidden" formControlName="sellerId" />
-   <div class="mt-3 formgrid grid">
+   <div class="mt-3 formgrid grid form-big-skip">
       <div class="field col col-minimized">
          <p-treeSelect
             selectionMode="single"

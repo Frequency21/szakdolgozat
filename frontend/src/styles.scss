@@ -54,6 +54,18 @@ app-root {
     object-fit: cover;
 }
 
-.field {
+.form-big-skip .field {
     margin-bottom: 2rem !important;
+}
+
+.link {
+    color: var(--orange-500);
+    cursor: pointer;
+}
+
+.revert-fluid {
+    .p-fluid,
+    .p-button {
+        width: unset !important;
+    }
 }

@@ -7,11 +7,13 @@ import { MenubarModule } from 'primeng/menubar';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './auth/auth.interceptor';
+import { CategoriesComponent } from './components/categories/categories.component';
+import { ProductComponent } from './components/product/product.component';
 import { GlobalErrorHandler } from './shared/global.error.handler';
 import { SharedModule } from './shared/shared.module';
 
 @NgModule({
-   declarations: [AppComponent],
+   declarations: [AppComponent, CategoriesComponent, ProductComponent],
    imports: [
       AppRoutingModule,
       SharedModule,

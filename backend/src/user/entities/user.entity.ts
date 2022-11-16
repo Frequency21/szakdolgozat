@@ -2,7 +2,14 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { Message } from 'src/message/entities/message.entity';
 import { Product } from 'src/product/entities/product.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+   Column,
+   Entity,
+   JoinTable,
+   ManyToMany,
+   OneToMany,
+   PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum Role {
    admin = 'admin',
@@ -59,8 +66,9 @@ export class User {
    boughtProducts!: Product[];
 
    @ApiPropertyOptional({ type: [Product], default: [] })
-   @OneToMany(() => Product, (product) => product.basketOwner)
-   basket!: Product[];
+   @ManyToMany(() => Product, (product) => product.basketOwners)
+   @JoinTable()
+   baskets!: Product[];
 
    @ApiPropertyOptional({ type: [Message], default: [] })
    @OneToMany(() => Message, (message) => message.sender)
