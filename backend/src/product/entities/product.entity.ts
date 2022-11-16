@@ -1,7 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Category } from 'src/category/entities/category.entity';
+import {
+   Category,
+   CategoryProperties,
+} from 'src/category/entities/category.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+   Column,
+   Entity,
+   Index,
+   JoinColumn,
+   ManyToOne,
+   PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum Delivery {
    personal = 'personal',
@@ -9,7 +19,14 @@ export enum Delivery {
    other = 'other',
 }
 
+export enum Condition {
+   new = 'new',
+   used = 'used',
+   other = 'other',
+}
+
 @Entity()
+@Index('PRODUCT_PROPERTIES_INDEX', { synchronize: false })
 export class Product {
    @ApiProperty({ example: 1 })
    @PrimaryGeneratedColumn()
@@ -18,6 +35,10 @@ export class Product {
    @ApiProperty({ example: 'karóra' })
    @Column()
    name!: string;
+
+   @ApiProperty()
+   @Column('text')
+   description!: string;
 
    @ApiProperty({ example: 10_000 })
    @Column()
@@ -35,27 +56,56 @@ export class Product {
    @Column({ nullable: true, default: null })
    minPrice?: number;
 
-   @ApiProperty({ enum: Delivery, default: Delivery.personal })
-   @Column('enum', { enum: Delivery, default: Delivery.personal })
-   delivery!: Delivery;
+   @ApiProperty({ enum: Delivery, isArray: true, default: Delivery.personal })
+   @Column('enum', { enum: Delivery, array: true, default: [] })
+   deliveryOptions!: Delivery[];
+
+   @ApiProperty({ enum: Condition })
+   @Column('enum', { enum: Condition })
+   condition!: Condition;
 
    @ApiPropertyOptional()
-   @Column({ nullable: true, default: null })
+   @Column('real', { nullable: true, default: null })
    weight?: number;
 
    @ApiProperty({ isArray: true })
-   @Column('varchar', { array: true })
-   pictures?: string[];
+   @Column('varchar', { array: true, default: [] })
+   pictures!: string[];
+
+   @ApiPropertyOptional()
+   @Column('date', { nullable: true, default: null })
+   expiration?: Date;
+
+   @Column('jsonb', { default: {} })
+   properties!: CategoryProperties;
 
    @ApiProperty({ type: () => User })
    @ManyToOne(() => User, (user) => user.products)
-   seller?: User;
+   seller!: User;
+
+   @ApiProperty()
+   @Column({ name: 'sellerId' })
+   sellerId!: number;
 
    @ApiProperty({ type: () => User })
-   @ManyToOne(() => User, (user) => user.boughtProducts)
+   @ManyToOne(() => User, (user) => user.boughtProducts, { nullable: true })
+   @JoinColumn({ name: 'buyerId' })
    buyer?: User;
+
+   @ApiPropertyOptional()
+   @Column({ name: 'buyerId', nullable: true })
+   buyerId?: number;
+
+   @ApiProperty({ type: () => User })
+   @ManyToOne(() => User, (user) => user.basket)
+   basketOwner?: User;
 
    @ApiProperty({ type: () => Category })
    @ManyToOne(() => Category, (category) => category.products)
-   category?: Category;
+   @JoinColumn({ name: 'categoryId' })
+   category!: Category;
+
+   @ApiProperty()
+   @Column({ name: 'categoryId' })
+   categoryId!: number;
 }

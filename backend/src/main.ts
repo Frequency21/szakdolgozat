@@ -10,8 +10,14 @@ import { AppModule } from './app.module';
 import { SESSION_STORE } from './config/redis/redis.const';
 
 async function bootstrap() {
+   const isProduction =
+      env.NODE_ENV !== undefined && env.NODE_ENV === 'production';
+
    const app = await NestFactory.create(AppModule, {
       cors: false,
+      logger: isProduction
+         ? ['log', 'error']
+         : ['log', 'debug', 'error', 'verbose'],
    });
 
    app.use(cookieParser());
@@ -20,8 +26,8 @@ async function bootstrap() {
       // TODO: forbidNonWhitelisted false in production
       new ValidationPipe({
          transform: true,
-         whitelist: true,
-         forbidNonWhitelisted: true,
+         whitelist: isProduction,
+         forbidNonWhitelisted: !isProduction,
       }),
    );
    app.setGlobalPrefix('api');

@@ -12,13 +12,8 @@ import {
    takeUntil,
 } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { Category } from 'src/app/models/category.model';
 import { User } from 'src/app/models/user.model';
 import { AwsService } from 'src/app/shared/services/aws.service';
-import {
-   CategoryService,
-   deepCloneTree,
-} from 'src/app/shared/services/category.service';
 import { UserService } from '../user.service';
 
 @Component({
@@ -60,48 +55,12 @@ export class ProfileComponent implements OnDestroy {
 
    constructor(
       private fb: FormBuilder,
-      private categoryService: CategoryService,
       private http: HttpClient,
       private messageService: MessageService,
       private auth: AuthService,
       private aws: AwsService,
       private userService: UserService,
    ) {
-      this.categoryService
-         .getAllCategory()
-         .pipe(takeUntil(this.destroyed$))
-         .subscribe(categories => {
-            this.categories = categories;
-            this.categoryMenuItems = categories
-               .slice()
-               .sort((a, b) => a.name.localeCompare(b.name))
-               .map(category =>
-                  deepCloneTree(
-                     category,
-                     c =>
-                        ({
-                           label: c.name,
-                        } as MenuItem),
-                     'items',
-                  ),
-               );
-            this.categoryTreeNode = categories
-               .slice()
-               .sort((a, b) => a.name.localeCompare(b.name))
-               .map(category =>
-                  deepCloneTree(
-                     category,
-                     c =>
-                        ({
-                           label: c.name,
-                           data: c.id,
-                        } as TreeNode),
-                     'children',
-                  ),
-               );
-
-            console.log(JSON.stringify(this.categoryMenuItems, undefined, 4));
-         });
       this.auth.user$
          .pipe(
             takeUntil(this.destroyed$),
@@ -209,36 +168,5 @@ export class ProfileComponent implements OnDestroy {
          })
          .pipe(finalize(() => (this.disableSubmitBtn = false)))
          .subscribe(() => this.auth.updateUser({ ...formValue }));
-   }
-
-   // TODO kategóriás dolgokat törölni
-
-   categories: Category[] = [];
-
-   createCategory() {
-      const formValue = this.categoryForm.value;
-      this.categoryService
-         .createCategory({
-            name: formValue.categoryName!,
-            parentCategoryId:
-               formValue.parentCategoryId === ''
-                  ? undefined
-                  : Number(formValue.parentCategoryId),
-         })
-         .pipe(switchMap(() => this.categoryService.getAllCategory()))
-         .subscribe(categories => {
-            this.categories = categories;
-         });
-   }
-
-   deleteCategory() {
-      this.categoryService
-         .deleteCategory(+this.deleteCategoryForm.value.categoryId!)
-         .subscribe(console.log.bind(this, 'DELETED CATEGORY'));
-   }
-
-   treeSelect(value: any) {
-      // console.log(JSON.stringify(value, undefined, 4));
-      console.log('value', value);
    }
 }

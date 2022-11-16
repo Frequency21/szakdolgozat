@@ -58,6 +58,10 @@ export class User {
    @OneToMany(() => Product, (product) => product.buyer)
    boughtProducts!: Product[];
 
+   @ApiPropertyOptional({ type: [Product], default: [] })
+   @OneToMany(() => Product, (product) => product.basketOwner)
+   basket!: Product[];
+
    @ApiPropertyOptional({ type: [Message], default: [] })
    @OneToMany(() => Message, (message) => message.sender)
    sentMessages?: Message[];

@@ -1,0 +1,84 @@
+:host {
+    display: block;
+    padding: 1rem;
+}
+
+h1 {
+    margin-bottom: 2.5rem;
+}
+
+:host ::ng-deep {
+    .p-fileupload-row {
+        flex-wrap: wrap;
+    }
+
+    // p-fluid miatt
+    p-fileupload .p-fileupload-content button {
+        width: 3rem !important;
+    }
+
+    .p-fileupload .p-fileupload-row > div {
+        padding: 1rem 0rem;
+        flex-grow: 0;
+        // width: initial;
+
+        &:not(:last-child) {
+            padding-right: 1rem;
+        }
+
+        &:first-child {
+            width: calc(50px + 1rem);
+        }
+
+        &:nth-child(2) {
+            order: -1;
+            flex-grow: 1;
+            flex-basis: 100%;
+            @media screen and (min-width: 600px) {
+                flex-grow: 1;
+                flex-basis: auto;
+                order: 0;
+            }
+        }
+
+        &:nth-child(4) {
+            @media screen and (min-width: 600px) {
+                flex-grow: 0;
+            }
+            flex-grow: 1;
+            width: initial;
+        }
+    }
+}
+
+.properties-container {
+    display: flex;
+    flex-flow: row wrap;
+
+    .property-panel {
+        flex-basis: max-content;
+        display: flex;
+
+        &:not(:last-of-type) {
+            margin-right: 2rem;
+        }
+
+        h5 {
+            margin: 0;
+            margin-right: 1rem;
+        }
+
+        > * {
+            flex: 0 0 max-content;
+            display: flex;
+            gap: 16px;
+        }
+    }
+}
+
+.checkbox-vertical,
+.radiobuttons-vertical {
+    flex: 1 0 max-content;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+}

@@ -26,10 +26,10 @@ import {
 } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { Category } from './models/category.model';
-import { User } from './models/user.model';
+import { Role, User } from './models/user.model';
 import {
    CategoryService,
-   deepCloneTree,
+   deepCloneCategories,
 } from './shared/services/category.service';
 import { WebsocketService } from './shared/services/websocket.service';
 
@@ -170,45 +170,52 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
    }
 
    private getMenuItems(user: User | null, categories: Category[]): MenuItem[] {
-      const initialItems = categories
-         .slice()
-         .sort((a, b) => a.name.localeCompare(b.name))
-         .map(category =>
-            deepCloneTree(
-               category,
-               c =>
-                  ({
-                     label: c.name,
-                     items: c.subCategories.length > 0 ? [] : undefined,
-                  } as MenuItem),
-               'items',
-               true,
-            ),
-         );
+      const initialItems = deepCloneCategories(
+         categories,
+         c =>
+            ({
+               label: c.name,
+               items: c.subCategories.length > 0 ? [] : undefined,
+            } as MenuItem),
+         'items',
+         true,
+      );
 
       const categoriesItem: MenuItem = {
          label: 'Kategóriák',
          items: initialItems.length > 0 ? initialItems : undefined,
       };
 
+      if (!user) {
+         return [categoriesItem];
+      }
+
+      if (user.role === Role.admin) {
+         return [
+            {
+               label: 'Új kategória',
+               routerLink: ['admin/create-category'],
+            },
+            categoriesItem,
+         ];
+      }
+
       return [
          {
             label: 'Profil',
             icon: 'pi pi-fw pi-user',
             routerLink: ['users/profile'],
-            visible: user != null,
          },
          {
             label: 'Üzeneteim',
             icon: 'pi pi-envelope',
             routerLink: ['users/messages'],
-            visible: user != null,
          },
          categoriesItem,
          {
-            label: 'Users',
-            icon: 'pi pi-fw pi-user',
-            routerLink: ['users'],
+            label: 'Hírdetés feladása',
+            icon: 'pi pi-box',
+            routerLink: ['users/create-product'],
          },
       ];
    }

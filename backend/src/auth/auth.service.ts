@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import * as bcrypt from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { Request } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { RegisterWithPasswordDto } from 'src/user/dto/register-with-password.dto';
@@ -24,7 +24,7 @@ export class AuthService {
    ) {}
 
    public async register(registrationData: RegisterWithPasswordDto) {
-      const hashedPassword = await bcrypt.hash(registrationData.password, 10);
+      const hashedPassword = await hash(registrationData.password, 10);
       return this.usersService.create({
          ...registrationData,
          password: hashedPassword,
@@ -44,7 +44,7 @@ export class AuthService {
    ): Promise<User | null> | never {
       const user = await this.usersService.getByEmail(email);
       const isMatching = user.password
-         ? await bcrypt.compare(plainTextPassword, user.password)
+         ? await compare(plainTextPassword, user.password)
          : false;
       return isMatching ? user : null;
    }

@@ -1,0 +1,194 @@
+<h1>Hírdetés feladása</h1>
+
+<div class="mt-5 p-fluid formgrid grid" [formGroup]="productForm">
+   <div class="field col-12">
+      <span class="p-float-label"
+         ><input formControlName="name" pInputText type="text" id="name" />
+         <label for="name">Hírdetés neve</label>
+      </span>
+   </div>
+
+   <div class="field col-12">
+      <p-fileUpload
+         [customUpload]="true"
+         (uploadHandler)="myUploader($event)"
+         [multiple]="true"
+         accept="image/*"
+         [maxFileSize]="5000000"
+         chooseLabel="Képek választása"
+         cancelLabel="Mégse"
+         [showUploadButton]="false"
+      >
+         <ng-template pTemplate="toolbar">
+            <div class="mt-3"
+               >A képek a feltöltés sorrendjében fognak megjelenni!</div
+            >
+         </ng-template>
+      </p-fileUpload>
+   </div>
+
+   <div class="field col-12">
+      <p-treeSelect
+         selectionMode="single"
+         [options]="categoryTreeNode"
+         (onNodeSelect)="treeSelect($event)"
+         (onClear)="onTreeClear()"
+         placeholder="Kategória"
+         emptyMessage="Nincs még egyetlen kategória sem"
+         [showClear]="true"
+      >
+      </p-treeSelect>
+   </div>
+
+   <div
+      *ngIf="selectedCategoryProperties"
+      class="field col-12 properties-container"
+   >
+      <ng-container
+         *ngFor="let property of selectedCategoryProperties; index as i"
+         formGroupName="properties"
+      >
+         <div class="property-panel">
+            <h5>{{ property[0] }}</h5>
+            <div
+               *ngIf="property[1].multi; else radioButtons"
+               class="checkbox-vertical"
+            >
+               <p-checkbox
+                  *ngFor="let value of property[1].values"
+                  [label]="value"
+                  [value]="value"
+                  [formControl]="f['properties'].controls[property[0]]"
+               ></p-checkbox>
+            </div>
+            <ng-template #radioButtons>
+               <div class="radiobuttons-vertical">
+                  <p-radioButton
+                     *ngFor="let value of property[1].values"
+                     [label]="value"
+                     [value]="value"
+                     [formControlName]="property[0]"
+                  ></p-radioButton>
+               </div>
+            </ng-template>
+         </div>
+      </ng-container>
+   </div>
+
+   <div class="field col-12">
+      <span class="p-float-label">
+         <textarea
+            pInputTextarea
+            formControlName="description"
+            id="description"
+            rows="5"
+         ></textarea>
+         <label for="description">Termék leírása</label>
+      </span>
+   </div>
+
+   <div class="field col-12 md:col-12">
+      <div class="p-inputgroup">
+         <span class="p-inputgroup-addon">
+            <p-checkbox
+               formControlName="isAuction"
+               [binary]="true"
+               inputId="isAuction"
+               formControlName="isAuction"
+            ></p-checkbox>
+            <label for="isAuction" class="ml-2">Aukció</label>
+         </span>
+         <span class="p-float-label">
+            <p-inputNumber
+               formControlName="price"
+               itemid="price"
+               [min]="0"
+            ></p-inputNumber>
+            <label for="price">{{
+               f['isAuction'].value ? 'Kezdő ár' : 'Ár'
+            }}</label>
+            <span class="p-inputgroup-addon">Ft</span>
+         </span>
+      </div>
+   </div>
+   <div class="field col-12 md:col-6">
+      <span class="p-float-label">
+         <p-calendar
+            formControlName="expiration"
+            dateFormat="dd/mm/yy"
+            inputId="expiration"
+         ></p-calendar>
+         <label for="expiration">Lejárati határidő</label>
+      </span>
+   </div>
+   <div class="field col-12 md:col-6">
+      <span class="p-float-label"
+         ><p-inputNumber
+            formControlName="minBid"
+            inputId="minBid"
+            [min]="0"
+         ></p-inputNumber>
+         <label for="minBid">Licitlépcső</label>
+      </span>
+   </div>
+   <div class="field col-12 md:col-6">
+      <span class="p-float-label"
+         ><p-inputNumber
+            formControlName="minPrice"
+            inputId="minPrice"
+            [min]="0"
+         ></p-inputNumber>
+         <label for="minPrice">Minimum ár</label>
+      </span>
+   </div>
+
+   <div class="field col-12 md:col-6">
+      <span class="p-float-label">
+         <p-dropdown
+            formControlName="condition"
+            inputId="condition"
+            [options]="conditionOptions"
+            placeholder="Áru állapota"
+         ></p-dropdown>
+         <label for="condition">Áru állapota</label>
+      </span>
+   </div>
+   <div class="field col-12 md:col-6">
+      <div class="p-inputgroup">
+         <span class="p-float-label"
+            ><p-inputNumber
+               formControlName="weight"
+               inputId="weight"
+               [min]="0"
+               [minFractionDigits]="2"
+            ></p-inputNumber>
+            <label for="weight">Áru súlya</label>
+            <span class="p-inputgroup-addon">Kg</span>
+         </span>
+      </div>
+   </div>
+
+   <div class="field col-12 md:col-6">
+      <span class="p-float-label">
+         <p-multiSelect
+            formControlName="deliveryOptions"
+            #deliveryDropdown
+            [options]="deliveryOptions"
+            placeholder="Átvételi lehetőségek"
+            [showClear]="false"
+            [showHeader]="false"
+            inputId="delivery"
+         >
+         </p-multiSelect>
+         <label for="delivery">Átvételi lehetőségek</label>
+      </span>
+   </div>
+
+   <div class="field col-12 md:col-6 md:col-offset-3">
+      <button
+         pButton
+         label="Hírdetés feladása!"
+         (click)="submitForm()"
+      ></button>
+   </div>
+</div>

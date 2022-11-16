@@ -21,7 +21,13 @@ export class ProductController {
    constructor(private readonly productService: ProductService) {}
 
    @Post()
-   create(@Body() createProductDto: CreateProductDto) {
+   create(@Body() createProductDto: CreateProductDto): Promise<
+      {
+         name: string;
+         signedUrl: string;
+         url: string;
+      }[]
+   > {
       return this.productService.create(createProductDto);
    }
 

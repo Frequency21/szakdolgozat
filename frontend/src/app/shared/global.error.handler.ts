@@ -15,9 +15,9 @@ export class GlobalErrorHandler implements ErrorHandler {
       this.injector.get(MessageService).add({
          key: 'app',
          summary: 'error',
-         data: [error.error.message],
+         data: [error?.error?.message ?? error],
          severity: 'error',
-         life: 5000,
+         sticky: true,
       });
       this.injector.get(ApplicationRef).tick();
    }
