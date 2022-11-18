@@ -19,7 +19,8 @@ import { REDIS, SESSION_STORE } from './redis.const';
                   return 1;
                },
                retryStrategy(retries) {
-                  const nextRetry = retries > 4 ? 30 : retries * 5;
+                  const nextRetry =
+                     retries > 4 ? 30 : retries === 1 ? 0 : retries * 5;
                   Logger.error(
                      `(${retries}) ...retry after ${nextRetry} seconds.`,
                      'Redis Connection',

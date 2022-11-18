@@ -1,50 +1,31 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import {
-   BadRequestException,
-   Controller,
-   Get,
-   Inject,
-   InternalServerErrorException,
-   Req,
-   UseGuards,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
-import { S3_CLIENT } from 'src/aws/aws.const';
+import { AwsService } from './aws.service';
+import { SignFilesDto } from './dto/sign-files.dto';
 
 /* Hivatkozások: https://devcenter.heroku.com/articles/s3-upload-node */
 /* updated to JS v3.. https://www.npmjs.com/package/@aws-sdk/s3-request-presigner */
 @UseGuards(CookieAuthGuard)
 @Controller('aws')
 export class AwsController {
-   bucket = this.configService.get('S3_BUCKET');
+   constructor(private awsService: AwsService) {}
 
-   constructor(
-      @Inject(S3_CLIENT) private s3Client: S3Client,
-      private configService: ConfigService,
-   ) {}
+   @Post('sign-product-pictures')
+   getSignedUrls(@Body() files: SignFilesDto): Promise<
+      {
+         name: string;
+         signedUrl: string;
+         url: string;
+      }[]
+   > {
+      return this.awsService.signUrls('product', files.fileNames);
+   }
 
    @Get('sign-s3')
-   async getSignedUrl(@Req() request: Request) {
-      // error-handling
-      if (!this.s3Client || !this.bucket) {
-         throw new InternalServerErrorException();
-      }
-      if (!request.user) {
-         throw new BadRequestException();
-      }
-
-      const signedUrl = await getSignedUrl(
-         this.s3Client,
-         new PutObjectCommand({
-            Bucket: this.bucket,
-            Key: 'images/profile/' + request.user.id,
-            ACL: 'public-read',
-         }),
-      );
-
-      return { signedUrl, url: signedUrl.split('?')[0] };
+   getSignedUrl(
+      @Req() request: Request,
+   ): Promise<{ signedUrl: string; url: string }> {
+      return this.awsService.signUrl('profile/' + request.user!.id);
    }
 }

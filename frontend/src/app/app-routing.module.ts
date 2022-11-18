@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
+import { CategoriesComponent } from './components/categories/categories.component';
+import { ProductComponent } from './components/product/product.component';
 import { Role } from './models/user.model';
 
 const routes: Routes = [
@@ -20,6 +22,14 @@ const routes: Routes = [
          import('./components/register/register.module').then(
             m => m.RegisterModule,
          ),
+   },
+   {
+      path: 'categories/:id',
+      component: CategoriesComponent,
+   },
+   {
+      path: 'product/:id',
+      component: ProductComponent,
    },
    {
       path: 'users',

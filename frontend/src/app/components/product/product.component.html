@@ -1,0 +1,105 @@
+<ng-container *ngIf="product; else loading">
+   <div class="header">
+      <div class="name">{{ product.name }}</div>
+   </div>
+   <div class="content p-fluid formgrid grid grid-nogutter form-big-skip">
+      <p-galleria
+         class="field col-12 md:col-5"
+         [value]="galleryData"
+         [containerStyle]="{
+            'max-width': '300px'
+         }"
+         [circular]="true"
+         [showItemNavigators]="true"
+         [showThumbnails]="false"
+         [showIndicators]="true"
+         [showItemNavigatorsOnHover]="true"
+         [showIndicatorsOnItem]="false"
+         indicatorsPosition="top"
+      >
+         <ng-template pTemplate="item" let-item>
+            <img [src]="item.previewImageSrc" style="width: 100%" />
+         </ng-template>
+      </p-galleria>
+      <div class="field col-12 md:col-7 buy-panel">
+         <ng-container *ngIf="!product.isAuction; else licit">
+            <button pButton type="button" label="Megveszem"></button>
+            <button
+               pButton
+               type="button"
+               class="p-button-secondary"
+               label="Kosárba teszem"
+            ></button>
+         </ng-container>
+         <ng-template #licit>
+            <span class="p-float-label"
+               ><p-inputNumber
+                  #licitInput
+                  [ngModel]="0"
+                  inputId="licit"
+                  [min]="0"
+               ></p-inputNumber>
+               <label for="licit">Licit</label>
+            </span>
+            <button
+               pButton
+               type="button"
+               label="Licitálok"
+               [disabled]="licitInput.value < product.minBid!"
+            ></button>
+         </ng-template>
+      </div>
+
+      <div class="field col-12 details">
+         <h3>Részletek</h3>
+         <div
+            ><span>Állapot:</span> {{ displayCondition[product.condition] }}
+         </div>
+         <div><span>Ár:</span> {{ product.price }}&nbsp;Ft</div>
+         <div class="description"
+            ><span>Leírás:</span> {{ product.description }}
+         </div>
+         <ng-container *ngIf="product.isAuction">
+            <div><span>Licitlépcső:</span> {{ product.minBid }} Ft</div>
+            <div><span>Minimum ár:</span> {{ product.minPrice }} Ft</div>
+            <div
+               ><span>Az aukció lejár ezen a napon</span>
+               {{ product.expiration | date: 'dd/MM/yy' }}
+            </div>
+         </ng-container>
+         <div *ngIf="product.weight !== undefined"
+            ><span>Súly:</span> {{ product.weight }} kg
+         </div>
+         <div
+            ><span>Szállítási lehetőségek:</span>
+            {{ displayDeliveryOptions(product.deliveryOptions) }}
+         </div>
+      </div>
+      <div class="field col-12 contact">
+         <h3>Kapcsolatfelvétel</h3>
+         <span class="seller link mb-5"
+            ><img class="avatar-mini" [src]="product.seller.picture" />
+            {{ product.seller.name }}</span
+         >
+         <br />
+         <span class="p-float-label mb-3">
+            <textarea
+               pInputTextarea
+               id="message"
+               rows="5"
+               #messageInput
+            ></textarea>
+            <label for="message">Privát üzenet</label>
+         </span>
+         <p-button
+            class="revert-fluid"
+            type="button"
+            icon="pi pi-envelope"
+            label="Üzenetet írok"
+            (click)="sendMessage(messageInput, product.seller.id)"
+         ></p-button>
+      </div>
+   </div>
+</ng-container>
+
+<ng-template #loading>Loading...</ng-template>

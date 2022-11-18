@@ -5,6 +5,7 @@ import {
    Delete,
    Get,
    Param,
+   ParseIntPipe,
    Patch,
    Post,
    UseInterceptors,
@@ -32,7 +33,7 @@ export class CategoryController {
    }
 
    @Get(':id')
-   findOne(@Param('id') id: string) {
+   findOne(@Param('id', ParseIntPipe) id: number) {
       return this.categoryService.findOne(+id);
    }
 

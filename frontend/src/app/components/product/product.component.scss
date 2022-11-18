@@ -1,0 +1,57 @@
+.content {
+    padding: 1rem;
+}
+
+p-galleria {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header {
+    width: 100%;
+    padding: 10px;
+    background-color: #eff0f1;
+}
+
+.name {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.buy-panel {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    
+    button {
+        max-width: 200px;
+    }
+}
+
+.details {
+    display: flex;
+    flex-flow: column nowrap;
+    > div > span {
+        font-weight: bold;
+    }
+}
+
+.seller {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin-bottom: 6px;
+
+    .avatar-mini {
+        margin-right: 8px;
+    }
+}
+
+.description {
+    word-break: break-all;
+    white-space: pre-line;
+}
+

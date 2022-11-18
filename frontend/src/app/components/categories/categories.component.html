@@ -1,0 +1,78 @@
+<ng-container *ngIf="products && category; else loading">
+   <div>
+      <h2>Szűrők</h2>
+   
+      <div class="p-fluid formgrid grid">
+         <!-- TODO: termék szűrés (pl.: aukció-e, ár tól-ig) -->
+         <div class="field col-12 field-title">
+            Kategória tulajdonságok
+         </div>
+         <div
+            *ngIf="properties"
+            [formGroup]="productFilterForm"
+            class="field col-12 properties-container"
+         >
+            <ng-container
+               *ngFor="let property of properties; index as i"
+               formGroupName="properties"
+            >
+               <div class="property-panel">
+                  <h5>{{ property[0] }}</h5>
+                  <div
+                     *ngIf="property[1].multi; else radioButtons"
+                     class="checkbox-vertical"
+                  >
+                     <p-checkbox
+                        *ngFor="let value of property[1].values"
+                        [label]="value"
+                        [value]="value"
+                        [formControl]="f['properties'].controls[property[0]]"
+                     ></p-checkbox>
+                  </div>
+                  <ng-template #radioButtons>
+                     <div class="radiobuttons-vertical">
+                        <p-radioButton
+                           *ngFor="let value of property[1].values"
+                           [label]="value"
+                           [value]="value"
+                           [formControlName]="property[0]"
+                        ></p-radioButton>
+                     </div>
+                  </ng-template>
+               </div>
+            </ng-container>
+         </div>
+         <div class="field col-12 md:col-6">
+            <button pButton label="Szűrés" (click)="submitFilter()"></button>
+         </div>
+         <div class="field col-12 md:col-6">
+            <button class="p-button-danger" pButton label="Szűrő visszaállítása" (click)="resetFilter()"></button>
+         </div>
+      </div>
+   </div>
+   <div class="product-row" *ngFor="let product of products">
+      <div>
+         <img [src]="product.pictures[0]" alt="Fotó a termékről" />
+      </div>
+      <div>
+         <div class="details">
+            <div class="title" (click)="navigateToProduct(product.id)"
+               >{{ product.name }}
+               <ng-container *ngIf="product.isAuction">
+                  &mdash; aukció</ng-container
+               ></div
+            >
+            <div class="condition"
+               >Állapot: {{ displayCondition[product.condition] }}
+            </div>
+            <div class="price">{{ product.price }}&nbsp;Ft</div>
+            <div class="seller">Eladó: {{ product.seller.name }} </div>
+            <div class="expiration" *ngIf="product.expiration">
+               Lejár ekkor &mdash; {{ product.expiration }}
+            </div>
+         </div>
+      </div>
+   </div>
+</ng-container>
+
+<ng-template #loading> <div>Loading...</div> </ng-template>

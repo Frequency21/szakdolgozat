@@ -11,6 +11,7 @@ export class CategoryService {
    async create(createCategoryDto: CreateCategoryDto) {
       const newCategory = new Category();
       newCategory.name = createCategoryDto.name;
+      newCategory.properties = createCategoryDto.properties;
       if (createCategoryDto.parentCategoryId) {
          const parent = await this.em.getTreeRepository(Category).findOneBy({
             id: createCategoryDto.parentCategoryId,
@@ -30,7 +31,7 @@ export class CategoryService {
    }
 
    findOne(id: number) {
-      return `This action returns a #${id} category`;
+      return this.em.getTreeRepository(Category).findOneBy({ id });
    }
 
    update(id: number, updateCategoryDto: UpdateCategoryDto) {

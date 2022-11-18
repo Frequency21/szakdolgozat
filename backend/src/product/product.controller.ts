@@ -7,11 +7,14 @@ import {
    Param,
    Patch,
    Post,
+   Query,
    UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from './dto/create-product.dto';
+import { FindProductDto } from './dto/find-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
 
 @ApiTags('product')
@@ -21,17 +24,31 @@ export class ProductController {
    constructor(private readonly productService: ProductService) {}
 
    @Post()
-   create(@Body() createProductDto: CreateProductDto) {
+   create(@Body() createProductDto: CreateProductDto): Promise<
+      {
+         name: string;
+         signedUrl: string;
+         url: string;
+      }[]
+   > {
       return this.productService.create(createProductDto);
    }
 
-   @Get()
-   findAll() {
-      return this.productService.findAll();
+   @Get('simple')
+   findAll(@Query('categoryId') categoryId?: string): Promise<Product[]> {
+      const parsedCategoryId = Number(categoryId);
+      return this.productService.findAll(
+         Number.isNaN(parsedCategoryId) ? undefined : parsedCategoryId,
+      );
+   }
+
+   @Post('filter')
+   findWhere(@Body() findProductDto: FindProductDto): Promise<Product[]> {
+      return this.productService.findWhere(findProductDto);
    }
 
    @Get(':id')
-   findOne(@Param('id') id: string) {
+   findOne(@Param('id') id: string): Promise<Product> {
       return this.productService.findOne(+id);
    }
 

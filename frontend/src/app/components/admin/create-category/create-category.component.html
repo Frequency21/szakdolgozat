@@ -1,0 +1,103 @@
+<form [formGroup]="createCategoryForm" (ngSubmit)="onSubmit()">
+   <input type="hidden" formControlName="parentId" />
+   <div class="mt-3 formgrid grid form-big-skip">
+      <div class="field col col-minimized">
+         <p-treeSelect
+            selectionMode="single"
+            [options]="categoryTreeNode"
+            (onNodeSelect)="treeSelect($event)"
+            (onClear)="onTreeClear()"
+            placeholder="Szülő kategória"
+            emptyMessage="Nincs még egyetlen kategória sem"
+            [showClear]="true"
+         >
+         </p-treeSelect>
+      </div>
+      <div class="field full-field col">
+         <span class="p-float-label">
+            <input
+               class="w-full"
+               pInputText
+               type="text"
+               formControlName="name"
+               id="name"
+            />
+            <label for="name">Kategória neve</label>
+         </span>
+      </div>
+      <div class="field col col-minimized">
+         <button
+            pButton
+            pRipple
+            type="button"
+            label="tulajdonság hozzáadása"
+            (click)="addProperty()"
+         ></button>
+      </div>
+      <div class="break"></div>
+      <ng-container formArrayName="properties">
+         <ng-container
+            *ngFor="
+               let property of propertiesControl.controls;
+               index as i;
+               last as last
+            "
+            [formGroupName]="i"
+         >
+            <div class="full-field field col">
+               <span class="p-float-label">
+                  <input
+                     class="w-full"
+                     pInputText
+                     type="text"
+                     formControlName="key"
+                     [attr.id]="'key-' + i"
+                  />
+                  <label [for]="'key-' + i">Kulcs</label>
+               </span>
+            </div>
+            <div class="field col-4 multi-slider">
+               <label [for]="'multi-' + i">Több értékű tulajdonság</label>
+               <p-inputSwitch
+                  formControlName="multi"
+                  [inputId]="'multi-' + i"
+               ></p-inputSwitch>
+            </div>
+
+            <div class="break"></div>
+
+            <div class="full-field field col mb-3">
+               <span class="p-float-label w-full">
+                  <p-chips
+                     formControlName="values"
+                     [attr.id]="'values-' + i"
+                     [addOnBlur]="true"
+                  ></p-chips>
+                  <label [for]="'values-' + i">Értékek</label>
+               </span>
+            </div>
+            <div class="delete-btn field col">
+               <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger"
+                  (click)="deleteProperty(i)"
+               ></button>
+            </div>
+
+            <ng-container *ngIf="!last">
+               <p-divider class="field col-12"></p-divider>
+            </ng-container>
+         </ng-container>
+      </ng-container>
+   </div>
+
+   <p-button
+      class="flex justify-content-center md:justify-content-start"
+      type="submit"
+      label="Kategória létrehozása"
+      [disabled]="!createCategoryForm.valid"
+   ></p-button>
+</form>

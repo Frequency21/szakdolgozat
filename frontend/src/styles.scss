@@ -53,3 +53,19 @@ app-root {
     border-radius: 100000px;
     object-fit: cover;
 }
+
+.form-big-skip .field {
+    margin-bottom: 2rem !important;
+}
+
+.link {
+    color: var(--orange-500);
+    cursor: pointer;
+}
+
+.revert-fluid {
+    .p-fluid,
+    .p-button {
+        width: unset !important;
+    }
+}

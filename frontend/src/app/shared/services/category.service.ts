@@ -7,29 +7,54 @@ import { Category, CreateCategoryDto } from 'src/app/models/category.model';
 pl.: csak 2 mélységig megyünk le, a szélességében
 pedig csak a legtöbb terméket tartalmazó kategóriák
 jelennének meg! */
-export function deepCloneTree<T = MenuItem>(
-   category: Category,
+function deepCloneTree<T = MenuItem>(
+   node: Category,
    mapper: (node: Category) => T,
    childrenKey: keyof T,
    sort = false,
+   extraPropertiesForLeaves: Partial<T> = {},
 ) {
-   if (category.subCategories.length === 0) {
-      return mapper(category);
+   if (node.subCategories.length === 0) {
+      return { ...mapper({ ...node }), ...extraPropertiesForLeaves };
    }
 
-   const newRoot = mapper(category);
+   const newRoot = mapper(node);
    (newRoot[childrenKey] as any) = [];
    const children = !sort
-      ? category.subCategories
-      : category.subCategories
-           .slice()
-           .sort((a, b) => a.name.localeCompare(b.name));
+      ? node.subCategories
+      : node.subCategories.slice().sort((a, b) => a.name.localeCompare(b.name));
    for (let i = 0; i < children.length; i++) {
-      const newChild = deepCloneTree(children[i], mapper, childrenKey);
+      const newChild = deepCloneTree(
+         children[i],
+         mapper,
+         childrenKey,
+         sort,
+         extraPropertiesForLeaves,
+      );
       (newRoot[childrenKey] as any).push(newChild);
    }
 
    return newRoot;
+}
+
+export function deepCloneCategories<T = MenuItem>(
+   categories: Category[],
+   mapper: (node: Category) => T,
+   childrenKey: keyof T,
+   sort = false,
+   extraPropertiesForLeaves: Partial<T> = {},
+) {
+   categories = categories.slice();
+   if (sort) categories.sort((a, b) => a.name.localeCompare(b.name));
+   return categories.map(category =>
+      deepCloneTree(
+         category,
+         mapper,
+         childrenKey,
+         sort,
+         extraPropertiesForLeaves,
+      ),
+   );
 }
 
 @Injectable({
@@ -40,6 +65,10 @@ export class CategoryService {
 
    getAllCategory() {
       return this.http.get<Category[]>('/api/category');
+   }
+
+   getCategory(id: number) {
+      return this.http.get<Category>(`/api/category/${id}`);
    }
 
    createCategory(category: CreateCategoryDto) {
