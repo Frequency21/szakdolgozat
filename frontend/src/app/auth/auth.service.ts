@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
-import { User } from '../models/user.model';
+import { LoginData } from '../models/user.model';
 
 @Injectable({
    providedIn: 'root',
 })
 export class AuthService {
-   private readonly user$$ = new BehaviorSubject<User | null>(null);
+   private readonly user$$ = new BehaviorSubject<LoginData | null>(null);
 
    loggedIn$ = this.user$$.pipe(map(user => user != null));
    user$ = this.user$$.pipe();
@@ -22,17 +22,17 @@ export class AuthService {
       return this.user$$.value;
    }
 
-   set user(user: User | null) {
+   set user(user: LoginData | null) {
       this.user$$.next(user);
    }
 
-   updateUser(partialUser: Partial<User>) {
+   updateUser(partialUser: Partial<LoginData>) {
       const currentUser = this.user;
       this.user$$.next(currentUser ? { ...currentUser, ...partialUser } : null);
    }
 
    autoLogin(): void {
-      this.http.get<User | null>('/api/auth').subscribe({
+      this.http.get<LoginData | null>('/api/auth').subscribe({
          next: user => {
             return this.user$$.next(user);
          },
@@ -60,13 +60,13 @@ export class AuthService {
 
    googleSignIn(jwt: string) {
       return this.http
-         .post<User | null>('/api/auth/google-sign-in', { jwt })
+         .post<LoginData | null>('/api/auth/google-sign-in', { jwt })
          .pipe(tap(user => this.user$$.next(user)));
    }
 
-   login(email: string, password: string): Observable<User | null> {
+   login(email: string, password: string): Observable<LoginData | null> {
       return this.http
-         .post<User | null>('/api/auth/login', {
+         .post<LoginData | null>('/api/auth/login', {
             email,
             password,
          })

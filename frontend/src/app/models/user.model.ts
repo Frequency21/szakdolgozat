@@ -1,4 +1,5 @@
-import { Product } from './product.model';
+import { Notification } from './notification.model';
+import { Product, ProductSimple } from './product.model';
 
 export enum Role {
    admin = 'admin',
@@ -7,15 +8,25 @@ export enum Role {
 
 export type User = {
    id: number;
-   email: string;
-   idp?: string;
    name: string;
-   picture?: string;
-   barionEmail?: string;
-   barionPosKey?: string;
-   role: Role;
-   products?: Product[];
+   picture: string[];
 };
 
-export type UpdateUserDto = Partial<Omit<User, 'idp' | 'password' | 'role'>> &
-   Pick<User, 'id'>;
+export type LoginData = {
+   id: number;
+   email: string;
+   idp?: string | null;
+   name: string;
+   picture?: string;
+   barionEmail?: string | null;
+   barionPosKey?: string | null;
+   role: Role;
+   products?: Product[];
+   baskets: ProductSimple[];
+   notifications: Notification[];
+};
+
+export type UpdateUserDto = Partial<
+   Omit<LoginData, 'idp' | 'password' | 'role'>
+> &
+   Pick<LoginData, 'id'>;

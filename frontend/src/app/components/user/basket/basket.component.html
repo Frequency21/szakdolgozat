@@ -1,0 +1,5 @@
+<app-product-item
+   *ngFor="let product of basket$ | async"
+   [product]="product"
+   [showRemove]="true"
+></app-product-item>

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -14,11 +15,14 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { SlideMenuModule } from 'primeng/slidemenu';
+import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { TreeSelectModule } from 'primeng/treeselect';
+import { ProductItemComponent } from '../components/product-item/product-item.component';
 
 const SHARED_MODULES = [
    // Angular
@@ -44,11 +48,16 @@ const SHARED_MODULES = [
    InputNumberModule,
    MultiSelectModule,
    GalleriaModule,
+   OverlayPanelModule,
+   TableModule,
+   BadgeModule,
 ];
 
+const SHARED_COMPONENTS = [ProductItemComponent];
+
 @NgModule({
-   declarations: [],
+   declarations: [SHARED_COMPONENTS],
    imports: [SHARED_MODULES],
-   exports: [SHARED_MODULES],
+   exports: [SHARED_MODULES, SHARED_COMPONENTS],
 })
 export class SharedModule {}

@@ -4,8 +4,14 @@ import { CategoryProperties } from 'src/app/models/category.model';
 import {
    CreateProductDto,
    Product,
+   ProductProperties,
    ProductSimple,
 } from 'src/app/models/product.model';
+
+export type CategoryFilterDto = {
+   categoryId: number;
+   properties: CategoryProperties;
+} & ProductProperties;
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -33,7 +39,7 @@ export class ProductService {
       >('/api/product', createProductDto);
    }
 
-   findWhere(payload: { properties: CategoryProperties; categoryId: number }) {
+   findWhere(payload: CategoryFilterDto) {
       return this.httpClient.post<Product[]>('/api/product/filter', payload);
    }
 }

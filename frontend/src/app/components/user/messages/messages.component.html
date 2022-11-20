@@ -8,7 +8,7 @@
       {{ partner.name }}
       <p-badge
          *ngIf="partner.unseenMessages"
-         [value]="partner.unseenMessages"
+         [value]="'' + partner.unseenMessages"
          severity="danger"
       ></p-badge>
    </div>

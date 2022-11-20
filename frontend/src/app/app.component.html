@@ -23,24 +23,73 @@
 <p-menubar #menuBar [model]="(items$ | async)!">
    <ng-template pTemplate="end">
       <p-button
-         class="mr-3"
-         label="auth"
-         icon="pi pi-lock"
-         (click)="onAuth()"
-      ></p-button>
-      <p-button
-         class="mr-3"
-         label="delete sess"
-         icon="pi pi-exclamation-circle"
-         (click)="onDeleteSession()"
-      ></p-button>
-      <p-button
-         [label]="loggedIn ? 'Kijelentkezés' : 'Bejelentkezés'"
-         [icon]="'pi ' + (loggedIn ? 'pi-power-off' : 'pi-user')"
+         *ngIf="loggedIn"
+         (click)="op.toggle($event)"
+         [icon]="'pi pi-bell'"
+         [badge]="notifications.length > 0 ? '' + notifications.length : ''"
+      >
+      </p-button>
+      <button
+         pButton
+         type="button"
+         class="p-button-rounded p-button-text"
+         [icon]="'pi ' + (loggedIn ? 'pi-sign-out' : 'pi-sign-in')"
          (click)="loggedIn ? onLogout() : onLogin()"
-      ></p-button>
+      ></button>
    </ng-template>
 </p-menubar>
+
+<p-overlayPanel #op [showCloseIcon]="true" [style]="{ width: '450px' }">
+   <ng-template pTemplate>
+      <p-table
+         [value]="notifications"
+         [paginator]="true"
+         [rows]="5"
+         responsiveLayout="scroll"
+      >
+         <ng-template pTemplate="header">
+            <tr>
+               <th>Kép</th>
+               <th pSortableColumn="product.name"
+                  >Név<p-sortIcon field="product.name"></p-sortIcon
+               ></th>
+               <th pSortableColumn="product.price"
+                  >Ár <p-sortIcon field="product.price"></p-sortIcon
+               ></th>
+               <th style="width: 3rem"></th>
+            </tr>
+         </ng-template>
+         <ng-template pTemplate="body" let-notification>
+            <tr>
+               <td
+                  ><img
+                     [src]="notification.product.picture"
+                     alt="Nincs kép"
+                     class="product-picture"
+               /></td>
+               <td>{{ notification.product.name }}</td>
+               <td>{{ notification.product.price }}&nbsp;Ft</td>
+               <td>
+                  <button
+                     pButton
+                     type="button"
+                     class="p-button-rounded p-button-text"
+                     icon="pi pi-eye"
+                     (click)="selectProduct(notification, op)"
+                  ></button>
+               </td>
+            </tr>
+         </ng-template>
+         <ng-template pTemplate="emptymessage">
+            <tr>
+               <td colspan="3">
+                  Nincs új termék a megfigyelt kategóriáidban!
+               </td>
+            </tr>
+         </ng-template>
+      </p-table>
+   </ng-template>
+</p-overlayPanel>
 
 <div class="app-content">
    <router-outlet></router-outlet>

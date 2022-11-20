@@ -12,7 +12,7 @@ import {
    takeUntil,
 } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { User } from 'src/app/models/user.model';
+import { LoginData } from 'src/app/models/user.model';
 import { AwsService } from 'src/app/shared/services/aws.service';
 import { UserService } from '../user.service';
 
@@ -49,7 +49,7 @@ export class ProfileComponent implements OnDestroy {
 
    choosenFile: any;
 
-   user?: User;
+   user?: LoginData;
 
    destroyed$ = new ReplaySubject<void>(1);
 

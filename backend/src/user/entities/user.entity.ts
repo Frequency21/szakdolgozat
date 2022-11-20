@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { CategoryFilter } from 'src/category/entities/category-filter.entity';
 import { Message } from 'src/message/entities/message.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
 import { Product } from 'src/product/entities/product.entity';
 import {
    Column,
@@ -31,31 +33,31 @@ export class User {
    name!: string;
 
    @Exclude()
-   @Column({ nullable: true, default: null })
-   password?: string;
+   @Column({ type: 'text', nullable: true, select: false })
+   password!: string | null;
 
    /** Identity provider (in case of OIDC authentication) */
-   @Column({ nullable: true, default: null })
-   idp?: string;
+   @Column({ type: 'text', nullable: true, select: false })
+   idp!: string | null;
 
    @ApiProperty({
       example: 'https://cute-hedgehog-photos.com/sanyi.jpg',
       nullable: true,
    })
-   @Column({ nullable: true, default: null })
-   picture?: string;
+   @Column({ type: 'text', nullable: true })
+   picture!: string | null;
 
    @ApiProperty({ enum: Role, default: Role.customer })
    @Column('enum', { enum: Role, default: Role.customer })
    role!: Role;
 
    @ApiPropertyOptional({ example: 'random UUID' })
-   @Column({ nullable: true, default: null })
-   barionPosKey?: string;
+   @Column({ type: 'text', nullable: true, select: false })
+   barionPosKey!: string | null;
 
    @ApiPropertyOptional({ example: 'random email' })
-   @Column({ nullable: true, default: null })
-   barionEmail?: string;
+   @Column({ type: 'text', nullable: true, select: false })
+   barionEmail!: string | null;
 
    @ApiPropertyOptional({ type: [Product], default: [] })
    @OneToMany(() => Product, (product) => product.seller)
@@ -67,7 +69,11 @@ export class User {
 
    @ApiPropertyOptional({ type: [Product], default: [] })
    @ManyToMany(() => Product, (product) => product.basketOwners)
-   @JoinTable()
+   @JoinTable({
+      name: 'user_baskets',
+      joinColumn: { name: 'userId' },
+      inverseJoinColumn: { name: 'productId' },
+   })
    baskets!: Product[];
 
    @ApiPropertyOptional({ type: [Message], default: [] })
@@ -77,6 +83,14 @@ export class User {
    @ApiPropertyOptional({ type: [Message], default: [] })
    @OneToMany(() => Message, (message) => message.receiver)
    receivedMessages?: Message[];
+
+   @ApiPropertyOptional({ type: [CategoryFilter], default: [] })
+   @OneToMany(() => CategoryFilter, (cf) => cf.user)
+   categoryFilters?: CategoryFilter[];
+
+   @ApiPropertyOptional({ type: [Notification], default: [] })
+   @OneToMany(() => Notification, (notification) => notification.user)
+   notifications?: Notification[];
 }
 
 export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &

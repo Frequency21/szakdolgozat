@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import {
    combineLatest,
    debounceTime,
@@ -25,8 +26,11 @@ import {
    takeUntil,
 } from 'rxjs';
 import { AuthService } from './auth/auth.service';
+import { UserService } from './components/user/user.service';
 import { Category } from './models/category.model';
-import { Role, User } from './models/user.model';
+import { Notification } from './models/notification.model';
+import { ProductSimple } from './models/product.model';
+import { LoginData, Role } from './models/user.model';
 import {
    CategoryService,
    deepCloneCategories,
@@ -40,6 +44,8 @@ import { WebsocketService } from './shared/services/websocket.service';
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
    private destroyed$ = new ReplaySubject<void>();
+
+   notifications: Notification[] = [];
 
    private readonly resizeObservable = (element: Element | undefined) => {
       return new Observable<ResizeObserverEntry[]>(observer => {
@@ -104,10 +110,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
       private primengConfig: PrimeNGConfig,
       private authService: AuthService,
       private categoryService: CategoryService,
+      private userService: UserService,
       private router: Router,
       private http: HttpClient,
       private ngZone: NgZone,
-      private websocketService: WebsocketService,
+      // initialize ws client
+      private webSocketService: WebsocketService,
    ) {
       this.ngZone.runOutsideAngular(() => {
          combineLatest({
@@ -129,10 +137,16 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
       const categories$ = this.categoryService
          .getAllCategory()
          .pipe(takeUntil(this.destroyed$));
+      const basket$ = this.userService.basket$$;
 
-      this.items$ = combineLatest([user$, categories$]).pipe(
+      this.items$ = combineLatest([user$, categories$, basket$]).pipe(
          map(args => this.getMenuItems(...args)),
       );
+
+      this.webSocketService.notifications$.subscribe(notifications => {
+         console.log('new notifications', notifications);
+         this.notifications = notifications;
+      });
    }
 
    ngAfterViewChecked(): void {
@@ -169,7 +183,22 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          .subscribe(resp => console.log(resp));
    }
 
-   private getMenuItems(user: User | null, categories: Category[]): MenuItem[] {
+   async selectProduct(
+      { id, product: { id: productId } }: Notification,
+      op: OverlayPanel,
+   ) {
+      const success = await this.router.navigate(['product', productId]);
+      if (success) {
+         op.hide();
+         this.webSocketService.seenNotification(id);
+      }
+   }
+
+   private getMenuItems(
+      user: LoginData | null,
+      categories: Category[],
+      basket: ProductSimple[],
+   ): MenuItem[] {
       const initialItems = deepCloneCategories(
          categories,
          c =>
@@ -224,6 +253,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
             label: 'Hírdetés feladása',
             icon: 'pi pi-box',
             routerLink: ['users/create-product'],
+         },
+         {
+            label: 'Kosaram',
+            icon: 'pi pi-shopping-cart',
+            routerLink: ['users', 'basket'],
+            badge: basket.length > 0 ? '' + basket.length : '',
          },
       ];
    }

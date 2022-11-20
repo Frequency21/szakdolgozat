@@ -8,9 +8,11 @@ import {
    Patch,
    Post,
    Query,
+   UseGuards,
    UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FindProductDto } from './dto/find-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -23,6 +25,7 @@ import { ProductService } from './product.service';
 export class ProductController {
    constructor(private readonly productService: ProductService) {}
 
+   @UseGuards(CookieAuthGuard)
    @Post()
    create(@Body() createProductDto: CreateProductDto): Promise<
       {

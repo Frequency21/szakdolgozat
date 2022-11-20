@@ -189,6 +189,7 @@
       <button
          pButton
          label="Hírdetés feladása!"
+         [disabled]="productForm.invalid"
          (click)="submitForm()"
       ></button>
    </div>

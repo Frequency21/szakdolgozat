@@ -14,17 +14,13 @@ import {
    WebsocketService,
 } from 'src/app/shared/services/websocket.service';
 
-type PartnerWithMarker = Partner & {
-   unseenMessages?: string;
-};
-
 @Component({
    selector: 'app-messages',
    templateUrl: './messages.component.html',
    styleUrls: ['./messages.component.scss'],
 })
 export class MessagesComponent implements OnInit, OnDestroy {
-   partners?: PartnerWithMarker[];
+   partners?: Partner[];
 
    selectedUserId?: number;
 
@@ -71,11 +67,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
                const partner = this.partners!.find(p => p.id === message.from);
 
                // TODO: új üzenet jött olyantól, aki még nincs a partner listán
-               if (!partner) return;
+               if (!partner) {
+                  this.websocketService.refreshPartners();
+                  return;
+               }
 
-               partner.unseenMessages = partner.unseenMessages
-                  ? String(+partner.unseenMessages + 1)
-                  : '1';
+               partner.unseenMessages += 1;
             } else {
                this.messages!.push({
                   seen: true,
@@ -108,12 +105,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.destroyed$.complete();
    }
 
-   selectUser(partner: PartnerWithMarker) {
+   selectUser(partner: Partner) {
       if (partner.id === this.selectedUserId) {
          this.router.navigate(['users', 'messages']);
          return;
       }
-      partner.unseenMessages = undefined;
+      partner.unseenMessages = 0;
+      this.websocketService.seenMessages(partner.id);
       this.router.navigate(['users', 'messages', partner.id]);
    }
 

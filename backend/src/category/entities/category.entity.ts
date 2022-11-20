@@ -10,6 +10,7 @@ import {
    TreeChildren,
    TreeParent,
 } from 'typeorm';
+import { CategoryFilter } from './category-filter.entity';
 
 export type CategoryProperties = Record<
    string,
@@ -48,4 +49,8 @@ export class Category {
    @ApiPropertyOptional({ type: () => Product })
    @OneToMany(() => Product, (product) => product.category)
    products?: Product[];
+
+   @ApiPropertyOptional({ type: () => CategoryFilter })
+   @OneToMany(() => CategoryFilter, (cf) => cf.category)
+   categoryFilter?: CategoryFilter[];
 }

@@ -9,10 +9,11 @@ import { CategoryModule } from './category/category.module';
 import dbConfig from './config/database.config';
 import { RedisModule } from './config/redis/redis.module';
 import { staticServeConfig } from './config/serve-static.config';
-import { WSMessagesModule } from './websockets/ws-messages.module';
+import { WSMessagesModule } from './websockets/ws-main.module';
 import { MessageModule } from './message/message.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { NotificationModule } from './notification/notification.module';
 @Module({
    imports: [
       ConfigModule.forRoot({
@@ -34,6 +35,7 @@ import { UserModule } from './user/user.module';
       AwsModule,
       WSMessagesModule,
       EventEmitterModule.forRoot(),
+      NotificationModule,
    ],
 })
 export class AppModule {}

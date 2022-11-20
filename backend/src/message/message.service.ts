@@ -61,22 +61,75 @@ export class MessageService {
       return `This action removes a #${id} message`;
    }
 
-   getPartners(id: number) {
-      return this.messageRepo.manager
-         .createQueryBuilder(User, 'u')
-         .select(['id', 'name', 'picture'])
-         .where((qb) => {
-            const subQuery = qb
-               .subQuery()
-               .select(
-                  'distinct case when m.receiverId = :id then m.senderId ' +
-                     'when m.senderId = :id then m.receiverId end',
-                  'partnerId',
-               )
-               .from(Message, 'm');
-            return 'u.id in ' + subQuery.getQuery();
-         })
+   async getPartners(id: number): Promise<
+      {
+         id: number;
+         name: string;
+         picture: string[];
+         unseenMessages: number;
+      }[]
+   > {
+      const messagePartners = await this.messageRepo
+         .createQueryBuilder('m')
+         .select([
+            'sender.id as "senderId"',
+            'sender.name as "senderName"',
+            'sender.picture as "senderPicture"',
+            'receiver.id as "receiverId"',
+            'receiver.name as "receiverName"',
+            'receiver.picture as "receiverPicture"',
+         ])
+         .addSelect([
+            'm.receiverId as "receiverId"',
+            'm.senderId as "senderId"',
+            'sum(case when m.receiverId = :id and m.seen = false then 1 else 0 end)::int4 as "unseenMessages"',
+         ])
+         .leftJoin(User, 'sender', 'sender.id = m.senderId')
+         .leftJoin(User, 'receiver', 'receiver.id = m.receiverId')
+         .where('m.receiverId = :id')
+         .orWhere('m.senderId = :id')
+         .groupBy('sender.id')
+         .addGroupBy('sender.name')
+         .addGroupBy('sender.picture')
+         .addGroupBy('receiver.id')
+         .addGroupBy('receiver.name')
+         .addGroupBy('receiver.picture')
+         .addGroupBy('m.senderId')
+         .addGroupBy('m.receiverId')
          .setParameter('id', id)
          .getRawMany();
+
+      return messagePartners.map((partner) => {
+         const {
+            senderId,
+            senderName,
+            senderPicture,
+            receiverId,
+            receiverName,
+            receiverPicture,
+            ...result
+         } = partner;
+         if (senderId === id) {
+            return {
+               ...result,
+               id: receiverId,
+               name: receiverName,
+               picture: receiverPicture,
+            };
+         }
+         return {
+            ...result,
+            id: senderId,
+            name: senderName,
+            picture: senderPicture,
+         };
+      });
+   }
+
+   seenMessages(id: any, partnerId: number) {
+      this.messageRepo.update(
+         { receiverId: id, senderId: partnerId },
+         { seen: true },
+      );
    }
 }

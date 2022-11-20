@@ -14,6 +14,10 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
+import {
+   SentMessagePayload,
+   SENT_MESSAGE_EVENT,
+} from 'src/events/sent-message.event';
 import { CurrentUser } from 'src/shared/decorators/user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -35,7 +39,7 @@ export class MessageController {
       @Body() createMessageDto: CreateMessageDto,
       @CurrentUser() user: User,
    ) {
-      const message = this.messageService.create(
+      const message = await this.messageService.create(
          user.id,
          to,
          createMessageDto.text,
@@ -73,6 +77,3 @@ export class MessageController {
       return this.messageService.remove(+id);
    }
 }
-
-export const SENT_MESSAGE_EVENT = 'sent_message';
-export type SentMessagePayload = { text: string; from: number; to: number };

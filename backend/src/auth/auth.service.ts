@@ -9,6 +9,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { compare, hash } from 'bcrypt';
 import { Request } from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import { LOGOUT_EVENT } from 'src/events/logout.event';
 import { RegisterWithPasswordDto } from 'src/user/dto/register-with-password.dto';
 import { GoogleSignInDto } from 'src/user/dto/sign-in-with-google.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -42,7 +43,7 @@ export class AuthService {
       email: string,
       plainTextPassword: string,
    ): Promise<User | null> | never {
-      const user = await this.usersService.getByEmail(email);
+      const user = await this.usersService.getByEmail(email, true);
       const isMatching = user.password
          ? await compare(plainTextPassword, user.password)
          : false;
@@ -68,7 +69,7 @@ export class AuthService {
                email: payload.email,
                idp: payload.iss,
                name: payload.name ?? 'Anonymus',
-               picture: payload.picture,
+               picture: payload.picture!,
             });
          } else {
             throw err;
@@ -91,6 +92,3 @@ export class AuthService {
       request.session.cookie.maxAge = 0;
    }
 }
-
-export const LOGOUT_EVENT = 'authentication.logout';
-export type LogoutPayload = { userId?: number };
