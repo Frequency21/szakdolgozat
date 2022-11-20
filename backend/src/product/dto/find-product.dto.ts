@@ -1,19 +1,16 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsOptional, Validate } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import { IsNumber, Validate } from 'class-validator';
 import { PropertiesSchema } from 'src/category/dto/create-category.dto';
+import { ProductProperties } from 'src/category/entities/category-filter.entity';
 import { CategoryProperties } from 'src/category/entities/category.entity';
 
-export class FindProductDto {
-   @ApiPropertyOptional()
-   @IsNumber()
-   @IsOptional()
-   weight?: number;
-
-   @ApiPropertyOptional()
-   @IsDateString()
-   @IsOptional()
-   expiration?: Date;
-
+export class FindProductDto extends PickType(ProductProperties, [
+   'expireUntil',
+   'isAuction',
+   'price',
+   'priceUntil',
+   'startedFrom',
+] as const) {
    @ApiPropertyOptional()
    @Validate(PropertiesSchema)
    properties!: CategoryProperties;

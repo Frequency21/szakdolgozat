@@ -1,4 +1,4 @@
-import { Product } from './product.model';
+import { Product, ProductProperties } from './product.model';
 
 export interface Category {
    id: number;
@@ -21,4 +21,10 @@ export interface CreateCategoryDto {
    name: string;
    parentCategoryId?: number;
    properties: CategoryProperties;
+}
+
+export interface CreateCategoryFilterDto {
+   categoryId?: number;
+   productProperties: ProductProperties;
+   categoryProperties: CategoryProperties;
 }

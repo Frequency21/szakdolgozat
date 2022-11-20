@@ -3,14 +3,17 @@ import {
    Category,
    CategoryProperties,
 } from 'src/category/entities/category.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
    Column,
+   CreateDateColumn,
    Entity,
    Index,
    JoinColumn,
    ManyToMany,
    ManyToOne,
+   OneToMany,
    PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -33,6 +36,9 @@ export class Product {
    @PrimaryGeneratedColumn()
    id!: number;
 
+   @CreateDateColumn({ name: 'created_date', type: 'date' })
+   createdDate!: Date;
+
    @ApiProperty({ example: 'karóra' })
    @Column()
    name!: string;
@@ -50,12 +56,12 @@ export class Product {
    isAuction!: boolean;
 
    @ApiPropertyOptional()
-   @Column({ nullable: true, default: null })
-   minBid?: number;
+   @Column({ type: 'int4', nullable: true })
+   minBid!: number | null;
 
    @ApiPropertyOptional()
-   @Column({ nullable: true, default: null })
-   minPrice?: number;
+   @Column({ type: 'int4', nullable: true })
+   minPrice!: number | null;
 
    @ApiProperty({ enum: Delivery, isArray: true, default: Delivery.personal })
    @Column('enum', { enum: Delivery, array: true, default: [] })
@@ -66,16 +72,16 @@ export class Product {
    condition!: Condition;
 
    @ApiPropertyOptional()
-   @Column('real', { nullable: true, default: null })
-   weight?: number;
+   @Column('real', { nullable: true })
+   weight!: number | null;
 
    @ApiProperty({ isArray: true })
    @Column('varchar', { array: true, default: [] })
    pictures!: string[];
 
    @ApiPropertyOptional()
-   @Column('date', { nullable: true, default: null })
-   expiration?: Date;
+   @Column('date', { nullable: true })
+   expiration!: Date | null;
 
    @Column('jsonb', { default: {} })
    properties!: CategoryProperties;
@@ -91,11 +97,11 @@ export class Product {
    @ApiProperty({ type: () => User })
    @ManyToOne(() => User, (user) => user.boughtProducts, { nullable: true })
    @JoinColumn({ name: 'buyerId' })
-   buyer?: User;
+   buyer?: User | null;
 
    @ApiPropertyOptional()
-   @Column({ name: 'buyerId', nullable: true })
-   buyerId?: number;
+   @Column({ name: 'buyerId', type: 'int4', nullable: true })
+   buyerId!: number | null;
 
    @ApiProperty({ type: () => [User] })
    @ManyToMany(() => User, (user) => user.baskets)
@@ -109,4 +115,8 @@ export class Product {
    @ApiProperty()
    @Column({ name: 'categoryId' })
    categoryId!: number;
+
+   @ApiPropertyOptional({ type: [Notification], default: [] })
+   @OneToMany(() => Notification, (notification) => notification.product)
+   notifications?: Notification[];
 }

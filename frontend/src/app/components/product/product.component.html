@@ -1,4 +1,4 @@
-<ng-container *ngIf="product; else loading">
+<ng-container *ngIf="product && basket; else loading">
    <div class="header">
       <div class="name">{{ product.name }}</div>
    </div>
@@ -25,11 +25,25 @@
          <ng-container *ngIf="!product.isAuction; else licit">
             <button pButton type="button" label="Megveszem"></button>
             <button
+               *ngIf="
+                  !productIsInBasket(product.id);
+                  else removeProductFromBasket
+               "
                pButton
                type="button"
                class="p-button-secondary"
                label="Kosárba teszem"
+               (click)="addToBasket(product)"
             ></button>
+            <ng-template #removeProductFromBasket>
+               <button
+                  pButton
+                  type="button"
+                  class="p-button-danger"
+                  label="Eltávolítás a kosárból"
+                  (click)="removeFromBasket(product.id)"
+               ></button>
+            </ng-template>
          </ng-container>
          <ng-template #licit>
             <span class="p-float-label"

@@ -8,7 +8,7 @@ import {
 import { Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
-import { Role, User } from 'src/app/models/user.model';
+import { Role, LoginData } from 'src/app/models/user.model';
 import { environment } from 'src/environments/environment';
 
 // will be defined by google client script
@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit {
          .subscribe(this.handleLogin);
    }
 
-   handleLogin = (user: User | null) => {
+   handleLogin = (user: LoginData | null) => {
       if (!user) {
          return;
       }

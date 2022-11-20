@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { TreeNode } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import {
    concatMap,
@@ -18,6 +18,7 @@ import {
    CreateProductDto,
    Delivery,
 } from 'src/app/models/product.model';
+import { setDateToMidnight } from 'src/app/shared/helpers/date.helper';
 import {
    CategoryService,
    deepCloneCategories,
@@ -37,7 +38,6 @@ export class CreateProductComponent implements OnDestroy {
 
    productForm = this.fb.nonNullable.group({
       name: ['', [Validators.required]],
-      pictures: [[] as string[]],
       categoryId: [null as number | null],
       description: ['', [Validators.required]],
       properties: this.fb.nonNullable.group<{
@@ -139,36 +139,30 @@ export class CreateProductComponent implements OnDestroy {
    }
 
    myUploader(event: { files: File[] }) {
-      this.chosenFiles = event.files;
-      const expiration = this.productForm.value.expiration
-         ? new Date(this.productForm.value.expiration)
-         : undefined;
-
-      if (expiration) {
-         const offset = expiration.getTimezoneOffset();
-
-         if (offset > 0) {
-            expiration.setUTCHours(0, 0, 0, 0);
-         } else {
-            expiration.setUTCHours(24, 0, 0, 0);
-         }
+      if (this.productForm.invalid) {
+         this.productForm.markAsDirty();
+         this.productForm.markAllAsTouched();
+         return;
       }
+      this.chosenFiles = event.files;
+      const value = this.productForm.value;
+      const expiration = setDateToMidnight(value.expiration);
 
       const createProductDto: CreateProductDto = {
-         categoryId: this.productForm.value.categoryId!,
-         condition: this.productForm.value.condition!,
-         deliveryOptions: this.productForm.value.deliveryOptions!,
-         description: this.productForm.value.description!,
-         isAuction: this.productForm.value.isAuction!,
-         name: this.productForm.value.name!,
+         categoryId: value.categoryId!,
+         condition: value.condition!,
+         deliveryOptions: value.deliveryOptions!,
+         description: value.description!,
+         isAuction: value.isAuction!,
+         name: value.name!,
          pictures: this.chosenFiles.map(file => file.name),
-         price: this.productForm.value.price!,
-         properties: transformProperties(this.productForm.value.properties!),
-         sellerId: this.productForm.value.sellerId!,
+         price: value.price!,
+         properties: transformProperties(value.properties!),
+         sellerId: value.sellerId!,
          expiration: expiration ?? undefined,
-         minBid: this.productForm.value.minBid ?? undefined,
-         minPrice: this.productForm.value.minPrice ?? undefined,
-         weight: this.productForm.value.weight ?? undefined,
+         minBid: value.minBid ?? undefined,
+         minPrice: value.minPrice ?? undefined,
+         weight: value.weight ?? undefined,
       };
 
       this.productService
@@ -176,7 +170,10 @@ export class CreateProductComponent implements OnDestroy {
          .pipe(
             concatMap(fileUploadData => {
                this.fileUploadComp.clear();
-               this.productForm.reset({});
+               this.productForm.reset({
+                  sellerId: this.productForm.value.sellerId,
+               });
+               this.onTreeClear();
                return forkJoin(
                   fileUploadData.map(fileUpload => {
                      const body = this.chosenFiles.find(
@@ -205,6 +202,7 @@ export class CreateProductComponent implements OnDestroy {
       Object.keys(this.f.properties.value).forEach(name => {
          (this.f.properties as any).removeControl(name);
       });
+      this.selectedCategoryProperties = [];
    }
 
    treeSelect({ node: { data } }: any) {

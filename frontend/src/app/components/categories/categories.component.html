@@ -1,17 +1,79 @@
 <ng-container *ngIf="products && category; else loading">
-   <div>
+   <div [formGroup]="productFilterForm">
       <h2>Szűrők</h2>
-   
-      <div class="p-fluid formgrid grid">
+      <div class="p-fluid formgrid grid form-big-skip">
          <!-- TODO: termék szűrés (pl.: aukció-e, ár tól-ig) -->
-         <div class="field col-12 field-title">
+         <div
+            class="field col-12 field-title"
+            style="margin-bottom: 2rem !important"
+         >
+            Termék tulajdonságok
+         </div>
+         <div class="field col-12 md:col-6">
+            <div class="p-inputgroup">
+               <span class="p-inputgroup-addon">
+                  <p-checkbox
+                     formControlName="isAuction"
+                     [binary]="true"
+                     inputId="isAuction"
+                     formControlName="isAuction"
+                  ></p-checkbox>
+                  <label for="isAuction" class="ml-2">Aukció</label>
+               </span>
+               <span class="p-float-label">
+                  <p-inputNumber
+                     formControlName="price"
+                     itemid="price"
+                     [min]="0"
+                  ></p-inputNumber>
+                  <label for="price">{{
+                     f['isAuction'].value ? 'Minimum kezdő ár' : 'Minimum ár'
+                  }}</label>
+                  <span class="p-inputgroup-addon">Ft</span>
+               </span>
+            </div>
+         </div>
+         <div class="field col-12 md:col-6">
+            <div class="p-inputgroup">
+               <span class="p-float-label">
+                  <p-inputNumber
+                     formControlName="priceUntil"
+                     itemid="priceUntil"
+                     [min]="0"
+                  ></p-inputNumber>
+                  <label for="priceUntil">Maximum ár</label>
+                  <span class="p-inputgroup-addon">Ft</span>
+               </span>
+            </div>
+         </div>
+         <div class="field col-12 md:col-6">
+            <span class="p-float-label">
+               <p-calendar
+                  formControlName="startedFrom"
+                  dateFormat="dd/mm/yy"
+                  inputId="startedFrom"
+               ></p-calendar>
+               <label for="startedFrom">Ettől a naptól hírdették meg</label>
+            </span>
+         </div>
+         <div class="field col-12 md:col-6">
+            <span class="p-float-label">
+               <p-calendar
+                  formControlName="expireUntil"
+                  dateFormat="dd/mm/yy"
+                  inputId="expireUntil"
+               ></p-calendar>
+               <label for="expireUntil">Lejár a következő napig</label>
+            </span>
+         </div>
+
+         <div
+            class="field col-12 field-title"
+            style="margin-bottom: 0 !important"
+         >
             Kategória tulajdonságok
          </div>
-         <div
-            *ngIf="properties"
-            [formGroup]="productFilterForm"
-            class="field col-12 properties-container"
-         >
+         <div *ngIf="properties" class="field col-12 properties-container">
             <ng-container
                *ngFor="let property of properties; index as i"
                formGroupName="properties"
@@ -42,37 +104,37 @@
                </div>
             </ng-container>
          </div>
-         <div class="field col-12 md:col-6">
-            <button pButton label="Szűrés" (click)="submitFilter()"></button>
+         <div class="field col-12 md:col-4">
+            <button
+               [disabled]="!productFilterForm.valid"
+               pButton
+               label="Szűrés"
+               (click)="submitFilter()"
+            ></button>
          </div>
-         <div class="field col-12 md:col-6">
-            <button class="p-button-danger" pButton label="Szűrő visszaállítása" (click)="resetFilter()"></button>
+         <div class="field col-12 md:col-4">
+            <button
+               class="p-button-danger"
+               pButton
+               label="Szűrő visszaállítása"
+               (click)="resetFilter()"
+            ></button>
          </div>
-      </div>
-   </div>
-   <div class="product-row" *ngFor="let product of products">
-      <div>
-         <img [src]="product.pictures[0]" alt="Fotó a termékről" />
-      </div>
-      <div>
-         <div class="details">
-            <div class="title" (click)="navigateToProduct(product.id)"
-               >{{ product.name }}
-               <ng-container *ngIf="product.isAuction">
-                  &mdash; aukció</ng-container
-               ></div
-            >
-            <div class="condition"
-               >Állapot: {{ displayCondition[product.condition] }}
-            </div>
-            <div class="price">{{ product.price }}&nbsp;Ft</div>
-            <div class="seller">Eladó: {{ product.seller.name }} </div>
-            <div class="expiration" *ngIf="product.expiration">
-               Lejár ekkor &mdash; {{ product.expiration }}
-            </div>
+         <div class="field col-12 md:col-4">
+            <button
+               class="p-button-success"
+               pButton
+               label="Kategória megfigyelése"
+               (click)="saveFilter()"
+            ></button>
          </div>
       </div>
    </div>
+
+   <app-product-item
+      *ngFor="let product of products"
+      [product]="product"
+   ></app-product-item>
 </ng-container>
 
 <ng-template #loading> <div>Loading...</div> </ng-template>

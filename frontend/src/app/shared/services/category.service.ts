@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { Category, CreateCategoryDto } from 'src/app/models/category.model';
+import {
+   Category,
+   CreateCategoryDto,
+   CreateCategoryFilterDto,
+} from 'src/app/models/category.model';
 
 /* TODO: lehetne majd mélységi és szélességi korlátozás
 pl.: csak 2 mélységig megyünk le, a szélességében
@@ -77,5 +81,9 @@ export class CategoryService {
 
    deleteCategory(categoryId: number) {
       return this.http.delete<Category>(`/api/category/${categoryId}`);
+   }
+
+   createCategoryFilter(createCategoryFilter: CreateCategoryFilterDto) {
+      return this.http.post('/api/category-filter', createCategoryFilter);
    }
 }

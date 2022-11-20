@@ -22,6 +22,7 @@ import {
 import { Request } from 'express';
 import { GoogleSignInDto } from 'src/user/dto/sign-in-with-google.dto';
 import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 import { RegisterWithPasswordDto } from '../user/dto/register-with-password.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -33,7 +34,10 @@ import { SignInWithGoogleGuard } from './guards/sign-in-with-google.guard';
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
-   constructor(private readonly authService: AuthService) {}
+   constructor(
+      private readonly authService: AuthService,
+      private userService: UserService,
+   ) {}
 
    @ApiOperation({ summary: 'Email and password registration' })
    @ApiCreatedResponse({
@@ -72,7 +76,7 @@ export class AuthController {
    @UseGuards(LogInWithCredentialsGuard)
    @Post('login')
    async logIn(@Req() request: Request) {
-      return request.user;
+      return this.userService.getLoginData(request.user!);
    }
 
    @ApiOperation({
@@ -88,8 +92,9 @@ export class AuthController {
    })
    @UseGuards(SignInWithGoogleGuard)
    @Post('google-sign-in')
-   signInWithGoogle(@Req() req: Request) {
-      return req.user;
+   async signInWithGoogle(@Req() req: Request) {
+      const result = await this.userService.getLoginData(req.user!);
+      return result;
    }
 
    @ApiOperation({
@@ -106,14 +111,13 @@ export class AuthController {
    }
 
    @ApiOperation({
-      summary: 'DEVELOPMENT',
       description: 'Returns user if theres a valid session',
    })
    @ApiOkResponse()
    @UseGuards(CookieAuthGuard)
    @Get()
    async authenticate(@Req() request: Request) {
-      return request.user;
+      return this.userService.getLoginData(request.user!);
    }
 
    @ApiOperation({

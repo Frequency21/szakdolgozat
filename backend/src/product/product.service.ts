@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsService } from 'src/aws/aws.service';
+import { CREATED_PRODUCT_EVENT } from 'src/events/created-product.event';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -16,6 +18,7 @@ export class ProductService {
       @InjectRepository(Product)
       private readonly productRepo: Repository<Product>,
       private readonly awsService: AwsService,
+      private eventEmitter: EventEmitter2,
    ) {}
 
    async create(createProductDto: CreateProductDto) {
@@ -37,7 +40,9 @@ export class ProductService {
          return signedUrl.url;
       });
 
-      await this.productRepo.save(createProductDto);
+      const product = await this.productRepo.save(createProductDto);
+      this.eventEmitter.emit(CREATED_PRODUCT_EVENT, product);
+
       return signedUrls;
    }
 
@@ -80,28 +85,32 @@ export class ProductService {
          .where('p.properties @> :props::jsonb', {
             props: findProductDto.properties,
          })
-         // .where('p.properties @> :props::jsonb', {
-         //    props: {
-         //       szín: {
-         //          multi: true,
-         //          values: ['fehér'],
-         //       },
-         //       háziasított: {
-         //          multi: false,
-         //          values: [],
-         //       },
-         //       aktivitás: {
-         //          multi: false,
-         //          values: [],
-         //       },
-         //    },
-         // })
          .andWhere('p.categoryId = :categoryId', {
             categoryId: findProductDto.categoryId,
          });
 
-      // console.log(sql.getQueryAndParameters());
-      console.log(JSON.stringify(sql.getQueryAndParameters(), null, 4));
+      const { isAuction, startedFrom, expireUntil, price, priceUntil } =
+         findProductDto;
+
+      if (startedFrom) {
+         sql.andWhere('p.created_date >= :startedFrom', { startedFrom });
+      }
+
+      if (expireUntil) {
+         sql.andWhere('p.expiration < :expireUntil', { expireUntil });
+      }
+
+      if (isAuction !== undefined) {
+         sql.andWhere('p.isAuction = :isAuction', { isAuction });
+      }
+
+      if (price !== undefined) {
+         sql.andWhere('p.price >= :price', { price });
+      }
+
+      if (priceUntil !== undefined) {
+         sql.andWhere('p.price < :priceUntil', { priceUntil });
+      }
 
       return sql.getMany();
    }

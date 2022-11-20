@@ -1,5 +1,5 @@
 import { Category, CategoryProperties } from './category.model';
-import { User } from './user.model';
+import { LoginData, User } from './user.model';
 
 export enum Delivery {
    personal = 'personal',
@@ -25,25 +25,17 @@ export const DISPLAY_CONDITION: Record<Condition, string> = {
    [Condition.other]: 'Egyéb',
 };
 
-export interface Product {
-   id: number;
-   name: string;
+export interface Product extends ProductSimple {
    description: string;
-   price: number;
    isAuction: boolean;
    minBid?: number;
    minPrice?: number;
    deliveryOptions: Delivery[];
-   condition: Condition;
    weight?: number;
-   pictures: string[];
-   expiration?: Date;
    properties: CategoryProperties;
-   seller: User;
    sellerId: number;
    buyer?: User;
    buyerId?: number;
-   basketOwners?: User[];
    category: Category;
    categoryId: number;
 }
@@ -75,3 +67,11 @@ export interface CreateProductDto {
    sellerId: number;
    categoryId: number;
 }
+
+export type ProductProperties = {
+   isAuction?: boolean;
+   price?: number;
+   priceUntil?: number;
+   expireUntil?: Date;
+   startedFrom?: Date;
+};
