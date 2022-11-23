@@ -90,21 +90,18 @@ export class WsMainGateway implements OnGatewayConnection, OnGatewayDisconnect {
    async handleCreatedProduct(payload: CreatedProductPayload) {
       const {
          userIdNotificationIdPair,
-         product: {
-            id: productId,
-            name,
-            price,
-            pictures: [picture],
-         },
+         product: { id: productId, name, price, pictures },
       } = await this.notificationService.findAllSubscriber(payload);
 
       for (const [userId, notificationId] of userIdNotificationIdPair) {
          this.server.in(userId).emit('new product', {
             id: notificationId,
-            productId,
-            name,
-            price,
-            picture,
+            product: {
+               id: productId,
+               name,
+               price,
+               pictures,
+            },
          });
       }
    }

@@ -28,3 +28,9 @@ export interface CreateCategoryFilterDto {
    productProperties: ProductProperties;
    categoryProperties: CategoryProperties;
 }
+
+export interface CategoryFilter extends ProductProperties {
+   id: number;
+   categoryProperties: CategoryProperties;
+   category: Pick<Category, 'id' | 'name' | 'properties'>;
+}

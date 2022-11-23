@@ -1,0 +1,143 @@
+<!-- cff[0] == filter's id -->
+<!-- cff[1] == filter's form -->
+<!-- cff[2] == filter's category Properties -->
+<!-- cff[3] == category name -->
+<h2>Szűrők</h2>
+<ng-container *ngIf="categoryFilterForms.length === 0; else filters">
+   <p
+      >Nincs még megfigyelt kategóriád!<br />Ha szeretnél, hozz létre kategória
+      szűrőket az egyes kategóriákban.</p
+   >
+</ng-container>
+
+<ng-template #filters>
+   <ng-container *ngFor="let cff of categoryFilterForms">
+      <div [formGroup]="cff[1]">
+         <div class="p-fluid formgrid grid form-big-skip">
+            <div
+               class="field col-12 field-title"
+               style="margin-bottom: 1rem !important"
+            >
+               Kategória: {{ cff[3] }}
+            </div>
+            <div
+               class="field col-12 field-title"
+               style="margin-bottom: 2rem !important"
+            >
+               Termék tulajdonságok
+            </div>
+            <div class="field col-12 md:col-6">
+               <div class="p-inputgroup">
+                  <span class="p-inputgroup-addon">
+                     <p-checkbox
+                        formControlName="isAuction"
+                        [binary]="true"
+                        inputId="isAuction"
+                        formControlName="isAuction"
+                     ></p-checkbox>
+                     <label for="isAuction" class="ml-2">Aukció</label>
+                  </span>
+                  <span class="p-float-label">
+                     <p-inputNumber
+                        formControlName="price"
+                        itemid="price"
+                        [min]="0"
+                     ></p-inputNumber>
+                     <label for="price">{{
+                        cff[1].controls['isAuction'].value
+                           ? 'Minimum kezdő ár'
+                           : 'Minimum ár'
+                     }}</label>
+                     <span class="p-inputgroup-addon">Ft</span>
+                  </span>
+               </div>
+            </div>
+            <div class="field col-12 md:col-6">
+               <div class="p-inputgroup">
+                  <span class="p-float-label">
+                     <p-inputNumber
+                        formControlName="priceUntil"
+                        itemid="priceUntil"
+                        [min]="0"
+                     ></p-inputNumber>
+                     <label for="priceUntil">Maximum ár</label>
+                     <span class="p-inputgroup-addon">Ft</span>
+                  </span>
+               </div>
+            </div>
+            <div class="field col-12 md:col-6">
+               <span class="p-float-label">
+                  <p-calendar
+                     formControlName="startedFrom"
+                     dateFormat="dd/mm/yy"
+                     inputId="startedFrom"
+                  ></p-calendar>
+                  <label for="startedFrom">Ettől a naptól hírdették meg</label>
+               </span>
+            </div>
+            <div class="field col-12 md:col-6">
+               <span class="p-float-label">
+                  <p-calendar
+                     formControlName="expireUntil"
+                     dateFormat="dd/mm/yy"
+                     inputId="expireUntil"
+                  ></p-calendar>
+                  <label for="expireUntil">Lejár a következő napig</label>
+               </span>
+            </div>
+
+            <div
+               class="field col-12 field-title"
+               style="margin-bottom: 0 !important"
+            >
+               Kategória tulajdonságok
+            </div>
+            <div *ngIf="cff[2]" class="field col-12 properties-container">
+               <ng-container
+                  *ngFor="let property of cff[2]; index as i"
+                  formGroupName="properties"
+               >
+                  <div class="property-panel">
+                     <h5>{{ property[0] }}</h5>
+                     <div
+                        *ngIf="property[1].multi; else radioButtons"
+                        class="checkbox-vertical"
+                     >
+                        <p-checkbox
+                           *ngFor="let value of property[1].values"
+                           [label]="value"
+                           [value]="value"
+                           [formControl]="
+                              cff[1].controls['properties'].controls[
+                                 property[0]
+                              ]
+                           "
+                        ></p-checkbox>
+                     </div>
+                     <ng-template #radioButtons>
+                        <div class="radiobuttons-vertical">
+                           <p-radioButton
+                              *ngFor="let value of property[1].values"
+                              [label]="value"
+                              [value]="value"
+                              [formControlName]="property[0]"
+                           ></p-radioButton>
+                        </div>
+                     </ng-template>
+                  </div>
+               </ng-container>
+            </div>
+            <div class="field col-12" style="text-align: center">
+               <button
+                  class="p-button-danger"
+                  style="max-width: 400px"
+                  type="button"
+                  pButton
+                  label="Szűrő törlése"
+                  (click)="deleteFilter(cff[0])"
+               ></button>
+            </div>
+         </div>
+      </div>
+   </ng-container>
+</ng-template>

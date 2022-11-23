@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, NgZone, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { MessageService, TreeNode } from 'primeng/api';
+import { TreeNode } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import {
    concatMap,
@@ -12,7 +12,6 @@ import {
    throwError,
 } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { CategoryProperties } from 'src/app/models/category.model';
 import {
    Condition,
    CreateProductDto,
@@ -24,6 +23,7 @@ import {
    deepCloneCategories,
 } from 'src/app/shared/services/category.service';
 import { ProductService } from 'src/app/shared/services/product.service';
+import { transformProperties } from '../../categories/categories.component';
 
 @Component({
    selector: 'app-create-product',
@@ -235,34 +235,4 @@ export class CreateProductComponent implements OnDestroy {
       // amennyiben ez sikeres, akkor feltölti aws-re a fotókat.
       this.fileUploadComp.upload();
    }
-}
-
-function transformProperties(
-   properties:
-      | {
-           [k: string]: string | string[] | undefined | null;
-        }
-      | undefined,
-): CategoryProperties {
-   if (!properties) return {};
-   return Object.fromEntries(
-      Object.entries(properties).map(([k, v]) => {
-         if (Array.isArray(v)) {
-            return [
-               k,
-               {
-                  multi: true,
-                  values: v,
-               },
-            ];
-         }
-         return [
-            k,
-            {
-               multi: false,
-               values: v == null ? [] : [v],
-            },
-         ];
-      }),
-   );
 }

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import {
    Category,
+   CategoryFilter,
    CreateCategoryDto,
    CreateCategoryFilterDto,
 } from 'src/app/models/category.model';
@@ -85,5 +86,13 @@ export class CategoryService {
 
    createCategoryFilter(createCategoryFilter: CreateCategoryFilterDto) {
       return this.http.post('/api/category-filter', createCategoryFilter);
+   }
+
+   getAllCategoryFilter() {
+      return this.http.get<CategoryFilter[]>('/api/category-filter');
+   }
+
+   deleteCategoryFilter(cfId: number) {
+      return this.http.delete(`/api/category-filter/${cfId}`);
    }
 }

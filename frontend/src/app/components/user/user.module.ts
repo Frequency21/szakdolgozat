@@ -7,6 +7,7 @@ import { CreateProductComponent } from './create-product/create-product.componen
 import { MessagesComponent } from './messages/messages.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UserRoutingModule } from './user-routing.module';
+import { CategoryFiltersComponent } from './category-filters/category-filters.component';
 
 @NgModule({
    declarations: [
@@ -14,6 +15,7 @@ import { UserRoutingModule } from './user-routing.module';
       MessagesComponent,
       CreateProductComponent,
       BasketComponent,
+      CategoryFiltersComponent,
    ],
    imports: [
       SharedModule,

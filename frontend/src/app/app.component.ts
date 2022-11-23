@@ -250,9 +250,14 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          },
          categoriesItem,
          {
+            label: 'Megfigyelt kategóriák',
+            icon: 'pi pi-filter',
+            routerLink: ['users', 'category-filters'],
+         },
+         {
             label: 'Hírdetés feladása',
             icon: 'pi pi-box',
-            routerLink: ['users/create-product'],
+            routerLink: ['users', 'create-product'],
          },
          {
             label: 'Kosaram',

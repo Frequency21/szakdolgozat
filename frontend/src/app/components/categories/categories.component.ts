@@ -26,7 +26,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
    properties?: [string, { multi: boolean; values: string[] }][];
 
    productFilterForm = this.fb.nonNullable.group({
-      isAuction: [null],
+      isAuction: [false],
       price: [null as number | null],
       priceUntil: [null as number | null],
       expireUntil: [null as Date | null],
@@ -121,7 +121,9 @@ export class CategoriesComponent implements OnInit, OnDestroy {
    }
 
    resetFilter() {
-      this.productFilterForm.reset();
+      this.productFilterForm.reset({
+         isAuction: false,
+      });
       if (!this.properties) return;
       console.log(this.productFilterForm.controls);
       Object.entries(this.properties).forEach(
@@ -157,7 +159,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
 // lehetne javítani azzal, hogy az üres arrayeket kifilterezzük
 // de a typescript típusok nagyon megőrülnek
-function transformProperties(
+/**
+ * @param properties properties form control értéke
+ * @returns a category categoryProperties sémájának megfelelő adatstruktúra
+ */
+export function transformProperties(
    properties:
       | {
            [k: string]: string | string[] | undefined | null;
@@ -183,6 +189,25 @@ function transformProperties(
                values: v == null ? [] : [v],
             },
          ];
+      }),
+   );
+}
+
+export type PropertiesControl = {
+   [k: string]: string[];
+};
+/**
+ * @param properties Category categoryPropertiesnek megfelelő struktúra
+ * @returns properties formcontrolnak megfelelő struktúra (patchValuehoz)
+ */
+export function inverseTransformProperties(
+   properties: CategoryProperties,
+): PropertiesControl {
+   if (!properties) {
+   }
+   return Object.fromEntries(
+      Object.entries(properties).map(([k, v]) => {
+         return [k, v.values];
       }),
    );
 }
