@@ -1,5 +1,5 @@
 import { Category, CategoryProperties } from './category.model';
-import { LoginData, User } from './user.model';
+import { User } from './user.model';
 
 export enum Delivery {
    personal = 'personal',
@@ -49,6 +49,7 @@ export interface ProductSimple {
    isAuction: boolean;
    seller: User;
    expiration?: Date;
+   highestBidder?: User;
 }
 
 export interface CreateProductDto {

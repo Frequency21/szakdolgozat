@@ -42,4 +42,19 @@ export class ProductService {
    findWhere(payload: CategoryFilterDto) {
       return this.httpClient.post<Product[]>('/api/product/filter', payload);
    }
+
+   bid(newPrice: number, productId: number) {
+      return this.httpClient.post<
+         | {
+              success: true;
+           }
+         | {
+              success: false;
+              product: { price: number; highestBidder: { name: string } };
+           }
+      >('/api/product/bid', {
+         newPrice,
+         productId,
+      });
+   }
 }

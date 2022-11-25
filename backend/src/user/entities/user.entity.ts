@@ -91,6 +91,11 @@ export class User {
 
    @OneToMany(() => Payment, (payment) => payment.buyer)
    payments!: Payment[];
+
+   @OneToMany(() => Product, (product) => product.highestBidder)
+   biddenProducts?: Product[];
+
+   wonUnpaidProducts?: Product[];
 }
 
 export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &

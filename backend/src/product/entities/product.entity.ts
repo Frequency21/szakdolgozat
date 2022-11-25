@@ -122,4 +122,11 @@ export class Product {
 
    @Column({ type: 'int4', name: 'transactionId', nullable: true })
    transactionId!: number | null;
+
+   @ManyToOne(() => User, (user) => user.biddenProducts, { nullable: true })
+   @JoinColumn({ name: 'highestBidderId' })
+   highestBidder?: User | null;
+
+   @Column({ type: 'int4', name: 'highestBidderId', nullable: true })
+   highestBidderId!: number | null;
 }

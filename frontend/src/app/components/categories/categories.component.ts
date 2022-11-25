@@ -2,12 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin, map, ReplaySubject, switchMap, takeUntil } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import {
    Category,
    CategoryProperties,
    CreateCategoryFilterDto,
 } from 'src/app/models/category.model';
 import { ProductSimple } from 'src/app/models/product.model';
+import { LoginData, Role } from 'src/app/models/user.model';
 import { setDateToMidnight } from 'src/app/shared/helpers/date.helper';
 import { CategoryService } from 'src/app/shared/services/category.service';
 import {
@@ -24,6 +26,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
    products?: ProductSimple[];
    category?: Category;
    properties?: [string, { multi: boolean; values: string[] }][];
+   user?: LoginData | null;
 
    productFilterForm = this.fb.nonNullable.group({
       isAuction: [false],
@@ -40,12 +43,16 @@ export class CategoriesComponent implements OnInit, OnDestroy {
       private route: ActivatedRoute,
       private productService: ProductService,
       private categoryService: CategoryService,
+      private authService: AuthService,
       private fb: FormBuilder,
    ) {}
 
    destroyed$ = new ReplaySubject<void>(1);
 
    ngOnInit(): void {
+      this.authService.user$
+         .pipe(takeUntil(this.destroyed$))
+         .subscribe(user => (this.user = user));
       this.route.paramMap
          .pipe(
             takeUntil(this.destroyed$),

@@ -237,6 +237,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          ];
       }
 
+      categoriesItem.items!.unshift({
+         label: 'Megfigyelt kategóriák',
+         icon: 'pi pi-filter',
+         routerLink: ['users', 'category-filters'],
+      });
+
       return [
          {
             label: 'Profil',
@@ -249,11 +255,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
             routerLink: ['users/messages'],
          },
          categoriesItem,
-         {
-            label: 'Megfigyelt kategóriák',
-            icon: 'pi pi-filter',
-            routerLink: ['users', 'category-filters'],
-         },
          {
             label: 'Hírdetés feladása',
             icon: 'pi pi-box',

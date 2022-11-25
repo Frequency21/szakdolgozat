@@ -184,9 +184,11 @@ export class BarionService {
 
       if (status === 'Succeeded') {
          await this.em.query(
-            `delete from user_baskets ub where ub."userId" in (
-            select "userId" from payment p where p."paymentId" = $1
-         )`,
+            `delete from user_baskets ub where ub."productId" in (
+               select pr.id from product pr
+                  left join payment pa on pa."paymentId" = pr."transactionId"
+               where pa."paymentId" = $1
+            )`,
             [paymentId],
          );
          return {

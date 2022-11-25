@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AwsService } from 'src/aws/aws.service';
 import { CREATED_PRODUCT_EVENT } from 'src/events/created-product.event';
 import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Raw, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FindProductDto } from './dto/find-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -55,6 +55,10 @@ export class ProductService {
                id: true,
                name: true,
             },
+            highestBidder: {
+               id: true,
+               name: true,
+            },
             price: true,
             pictures: true,
             condition: true,
@@ -63,31 +67,43 @@ export class ProductService {
          },
          where: {
             ...(categoryId == null ? {} : { categoryId }),
+            transactionId: IsNull(),
+            expiration: Raw(
+               (alias) =>
+                  `${alias} > (date_trunc('day', (now() AT TIME ZONE 'Europe/Budapest')) AT TIME ZONE 'Europe/Budapest')::date`,
+            ),
          },
-         relations: ['seller'],
+         relations: ['seller', 'highestBidder'],
       });
    }
 
    findOne(id: number) {
       return this.productRepo.findOneOrFail({
+         // sele
          where: {
             id,
          },
-         relations: { seller: true },
+         relations: {
+            seller: true,
+            highestBidder: true,
+         },
       });
    }
 
    findWhere(findProductDto: FindProductDto): Promise<Product[]> {
       const sql = this.productRepo
          .createQueryBuilder('p')
-         // .select('*')
          .leftJoinAndMapOne('p.seller', User, 'u', 'u.id = p.sellerId')
          .where('p.properties @> :props::jsonb', {
             props: findProductDto.properties,
          })
          .andWhere('p.categoryId = :categoryId', {
             categoryId: findProductDto.categoryId,
-         });
+         })
+         .andWhere(
+            `p.expiration > (date_trunc('day', (now() AT TIME ZONE 'Europe/Budapest')) AT TIME ZONE 'Europe/Budapest')::date`,
+         )
+         .andWhere('p.transactionId is null');
 
       const { isAuction, startedFrom, expireUntil, price, priceUntil } =
          findProductDto;
@@ -121,5 +137,46 @@ export class ProductService {
 
    remove(id: number) {
       return `This action removes a #${id} product`;
+   }
+
+   async bid(
+      user: User,
+      newPrice: number,
+      productId: number,
+   ): Promise<
+      | {
+           success: true;
+        }
+      | { success: false; product: Product }
+   > {
+      const { affected } = await this.productRepo
+         .createQueryBuilder()
+         .update(Product)
+         .set({
+            price: newPrice,
+            highestBidderId: user.id,
+         })
+         .where('price + minBid <= :newPrice', { newPrice })
+         .andWhere('id = :productId', { productId })
+         .andWhere(
+            `(date_trunc('day', (now() AT TIME ZONE 'Europe/Budapest')) AT TIME ZONE 'Europe/Budapest')::date < expiration`,
+         )
+         .execute();
+
+      const success = affected === 1;
+
+      if (!success) {
+         const product = (await this.productRepo.findOne({
+            select: { price: true, highestBidder: { id: true, name: true } },
+            where: { id: productId },
+            relations: ['highestBidder'],
+         }))!;
+         return {
+            success,
+            product,
+         };
+      }
+
+      return { success };
    }
 }

@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/constants/db/postgresql.error.codes';
 import { Notification } from 'src/notification/entities/notification.entity';
 import { Product } from 'src/product/entities/product.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Raw, Repository } from 'typeorm';
 import { RegisterWithPasswordDto } from './dto/register-with-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GoogleUser, User } from './entities/user.entity';
@@ -172,7 +172,7 @@ export class UserService {
          .leftJoinAndMapMany('u.baskets', Product, 'bp', 'b.productId = bp.id')
          .leftJoinAndMapOne('bp.seller', User, 'bps', 'bp.sellerId = bps.id')
          // ügyfél adatok
-         .select(['u.id', 'u.name', 'u.email', 'u.picture'])
+         .select(['u.id', 'u.name', 'u.email', 'u.picture', 'u.role'])
          .addSelect(['u.barionEmail', 'u.barionPosKey', 'u.idp'])
          // kosár adatok
          .addSelect(['b'])
@@ -194,11 +194,35 @@ export class UserService {
          .where('n.userId = :id', { id: user.id })
          .andWhere('n.seen = false')
          .getMany();
-      const [userEntity, notifications] = await Promise.all([
+      const wonUnpaidProductsQuery = this.em.find(Product, {
+         select: {
+            id: true,
+            name: true,
+            seller: {
+               id: true,
+               name: true,
+            },
+            price: true,
+            pictures: true,
+            condition: true,
+            expiration: true,
+         },
+         where: {
+            highestBidderId: user.id,
+            expiration: Raw(
+               (alias) =>
+                  `${alias} <= (date_trunc('day', (now() AT TIME ZONE 'Europe/Budapest')) AT TIME ZONE 'Europe/Budapest')::date`,
+            ),
+         },
+      });
+
+      const [userEntity, notifications, wonUnpaidProducts] = await Promise.all([
          userQuery,
          notificationsQuery,
+         wonUnpaidProductsQuery,
       ]);
       userEntity!.notifications = notifications;
+      userEntity!.wonUnpaidProducts = wonUnpaidProducts;
 
       return userEntity;
    }

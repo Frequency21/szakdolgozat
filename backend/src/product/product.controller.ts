@@ -13,6 +13,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
+import { CurrentUser } from 'src/shared/decorators/user.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { BidDto } from './dto/bid.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FindProductDto } from './dto/find-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -63,5 +66,11 @@ export class ProductController {
    @Delete(':id')
    remove(@Param('id') id: string) {
       return this.productService.remove(+id);
+   }
+
+   @UseGuards(CookieAuthGuard)
+   @Post('bid')
+   bid(@Body() { newPrice, productId }: BidDto, @CurrentUser() user: User) {
+      return this.productService.bid(user, newPrice, productId);
    }
 }
