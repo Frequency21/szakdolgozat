@@ -5,18 +5,21 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { AwsModule } from './aws/aws.module';
+import { BarionModule } from './barion/barion.module';
 import { CategoryModule } from './category/category.module';
 import dbConfig from './config/database.config';
 import { RedisModule } from './config/redis/redis.module';
 import { staticServeConfig } from './config/serve-static.config';
-import { WSMessagesModule } from './websockets/ws-main.module';
 import { MessageModule } from './message/message.module';
+import { NotificationModule } from './notification/notification.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
-import { NotificationModule } from './notification/notification.module';
+import { WSMessagesModule } from './websockets/ws-main.module';
 @Module({
    imports: [
       ConfigModule.forRoot({
+         isGlobal: true,
+         cache: true,
          load: [dbConfig],
       }),
       ServeStaticModule.forRoot(staticServeConfig),
@@ -36,6 +39,7 @@ import { NotificationModule } from './notification/notification.module';
       WSMessagesModule,
       EventEmitterModule.forRoot(),
       NotificationModule,
+      BarionModule,
    ],
 })
 export class AppModule {}

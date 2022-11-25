@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { Payment } from 'src/barion/entities/payment.entity';
 import { CategoryFilter } from 'src/category/entities/category-filter.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
@@ -64,10 +65,6 @@ export class User {
    products!: Product[];
 
    @ApiPropertyOptional({ type: [Product], default: [] })
-   @OneToMany(() => Product, (product) => product.buyer)
-   boughtProducts!: Product[];
-
-   @ApiPropertyOptional({ type: [Product], default: [] })
    @ManyToMany(() => Product, (product) => product.basketOwners)
    @JoinTable({
       name: 'user_baskets',
@@ -91,6 +88,9 @@ export class User {
    @ApiPropertyOptional({ type: [Notification], default: [] })
    @OneToMany(() => Notification, (notification) => notification.user)
    notifications?: Notification[];
+
+   @OneToMany(() => Payment, (payment) => payment.buyer)
+   payments!: Payment[];
 }
 
 export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &

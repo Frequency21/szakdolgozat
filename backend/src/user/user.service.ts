@@ -135,7 +135,7 @@ export class UserService {
          throw new NotFoundException();
       }
 
-      if (product.buyerId != null) {
+      if (product.transactionId != null) {
          throw new BadRequestException();
       }
 

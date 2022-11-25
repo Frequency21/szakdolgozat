@@ -1,5 +1,11 @@
-<app-product-item
-   *ngFor="let product of basket$ | async"
-   [product]="product"
-   [showRemove]="true"
-></app-product-item>
+<ng-container *ngIf="basket$ | async as products">
+   <app-product-item
+      *ngFor="let product of products"
+      [product]="product"
+      [showRemove]="true"
+   ></app-product-item>
+
+   <div class="col-12 p-fluid text-center mt-5" *ngIf="products.length > 0">
+      <button (click)="buyProducts(products)" class="pay-button" pButton label="Kifizetem"></button>
+   </div>
+</ng-container>

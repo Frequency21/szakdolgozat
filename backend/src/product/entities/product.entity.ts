@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Payment } from 'src/barion/entities/payment.entity';
 import {
    Category,
    CategoryProperties,
@@ -94,15 +95,6 @@ export class Product {
    @Column({ name: 'sellerId' })
    sellerId!: number;
 
-   @ApiProperty({ type: () => User })
-   @ManyToOne(() => User, (user) => user.boughtProducts, { nullable: true })
-   @JoinColumn({ name: 'buyerId' })
-   buyer?: User | null;
-
-   @ApiPropertyOptional()
-   @Column({ name: 'buyerId', type: 'int4', nullable: true })
-   buyerId!: number | null;
-
    @ApiProperty({ type: () => [User] })
    @ManyToMany(() => User, (user) => user.baskets)
    basketOwners?: User[];
@@ -119,4 +111,15 @@ export class Product {
    @ApiPropertyOptional({ type: [Notification], default: [] })
    @OneToMany(() => Notification, (notification) => notification.product)
    notifications?: Notification[];
+
+   @ManyToOne(() => Payment, (payment) => payment.products, {
+      nullable: true,
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+   })
+   @JoinColumn({ name: 'transactionId' })
+   transaction?: Payment;
+
+   @Column({ type: 'int4', name: 'transactionId', nullable: true })
+   transactionId!: number | null;
 }

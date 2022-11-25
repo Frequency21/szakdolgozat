@@ -22,6 +22,7 @@ export default registerAs(
                rejectUnauthorized: false,
             },
          },
+         logging: env.NODE_ENV === 'development',
       },
       local: {
          type: 'postgres',

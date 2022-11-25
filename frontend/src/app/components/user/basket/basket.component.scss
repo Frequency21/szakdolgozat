@@ -1,3 +1,10 @@
+@mixin desktop {
+    $md: 600px;
+    @media screen and (min-width: $md) {
+        @content;
+    }
+}
+
 :host {
     display: block;
     padding: 1rem;
@@ -13,7 +20,13 @@ app-product-item {
         margin-bottom: 2rem;
     }
 
-    @media screen and (min-width: 600px) {
+    @include desktop() {
         flex-flow: row;
+    }
+}
+
+@include desktop() {
+    .pay-button {
+        max-width: 500px;
     }
 }
