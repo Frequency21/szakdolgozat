@@ -9,7 +9,7 @@ export enum Role {
 export type User = {
    id: number;
    name: string;
-   picture: string[];
+   picture?: string;
 };
 
 export type LoginData = {
@@ -19,7 +19,6 @@ export type LoginData = {
    name: string;
    picture?: string;
    barionEmail?: string | null;
-   barionPosKey?: string | null;
    role: Role;
    products?: Product[];
    baskets: ProductSimple[];

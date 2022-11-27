@@ -33,13 +33,17 @@ export class UserController {
       };
    }
 
+   @UseGuards(CookieAuthGuard)
    @ApiCreatedResponse({
       type: User,
       description: 'Update user',
    })
    @Post()
-   async updateUser(@Body() updateUserDto: UpdateUserDto) {
-      const res = await this.userService.updateUser(updateUserDto);
+   async updateUser(
+      @Body() updateUserDto: UpdateUserDto,
+      @CurrentUser() user: User,
+   ) {
+      const res = await this.userService.updateUser(user.id, updateUserDto);
       return plainToClass(User, res);
    }
 

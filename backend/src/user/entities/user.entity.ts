@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { Payment } from 'src/barion/entities/payment.entity';
 import { CategoryFilter } from 'src/category/entities/category-filter.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
@@ -51,10 +52,6 @@ export class User {
    @Column('enum', { enum: Role, default: Role.customer })
    role!: Role;
 
-   @ApiPropertyOptional({ example: 'random UUID' })
-   @Column({ type: 'text', nullable: true, select: false })
-   barionPosKey!: string | null;
-
    @ApiPropertyOptional({ example: 'random email' })
    @Column({ type: 'text', nullable: true, select: false })
    barionEmail!: string | null;
@@ -64,11 +61,10 @@ export class User {
    products!: Product[];
 
    @ApiPropertyOptional({ type: [Product], default: [] })
-   @OneToMany(() => Product, (product) => product.buyer)
-   boughtProducts!: Product[];
-
-   @ApiPropertyOptional({ type: [Product], default: [] })
-   @ManyToMany(() => Product, (product) => product.basketOwners)
+   @ManyToMany(() => Product, (product) => product.basketOwners, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+   })
    @JoinTable({
       name: 'user_baskets',
       joinColumn: { name: 'userId' },
@@ -91,6 +87,12 @@ export class User {
    @ApiPropertyOptional({ type: [Notification], default: [] })
    @OneToMany(() => Notification, (notification) => notification.user)
    notifications?: Notification[];
+
+   @OneToMany(() => Payment, (payment) => payment.buyer)
+   payments!: Payment[];
+
+   @OneToMany(() => Product, (product) => product.highestBidder)
+   biddenProducts?: Product[];
 }
 
 export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &

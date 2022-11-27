@@ -103,37 +103,65 @@
                </div>
             </ng-container>
          </div>
-         <div class="field col-12 md:col-4">
-            <button
-               [disabled]="!productFilterForm.valid"
-               pButton
-               label="Szűrés"
-               (click)="submitFilter()"
-            ></button>
-         </div>
-         <div class="field col-12 md:col-4">
-            <button
-               class="p-button-danger"
-               pButton
-               label="Szűrő visszaállítása"
-               (click)="resetFilter()"
-            ></button>
-         </div>
-         <div class="field col-12 md:col-4">
-            <button
-               class="p-button-success"
-               pButton
-               label="Kategória megfigyelése"
-               (click)="saveFilter()"
-            ></button>
-         </div>
+         <ng-container *ngIf="user; else anonymus">
+            <div class="field col-12 md:col-4">
+               <button
+                  [disabled]="!productFilterForm.valid"
+                  pButton
+                  label="Szűrés"
+                  (click)="submitFilter()"
+               ></button>
+            </div>
+            <div class="field col-12 md:col-4">
+               <button
+                  class="p-button-danger"
+                  pButton
+                  label="Szűrő visszaállítása"
+                  (click)="resetFilter()"
+               ></button>
+            </div>
+            <div class="field col-12 md:col-4">
+               <button
+                  class="p-button-success"
+                  pButton
+                  label="Kategória megfigyelése"
+                  (click)="saveFilter()"
+               ></button>
+            </div>
+         </ng-container>
+         <ng-template #anonymus>
+            <div class="field col-12 md:col-6">
+               <button
+                  [disabled]="!productFilterForm.valid"
+                  pButton
+                  label="Szűrés"
+                  (click)="submitFilter()"
+               ></button>
+            </div>
+            <div class="field col-12 md:col-6">
+               <button
+                  class="p-button-danger"
+                  pButton
+                  label="Szűrő visszaállítása"
+                  (click)="resetFilter()"
+               ></button>
+            </div>
+         </ng-template>
       </div>
    </div>
 
-   <app-product-item
-      *ngFor="let product of products"
-      [product]="product"
-   ></app-product-item>
+   <ng-container *ngIf="products.length > 0; else noProducts">
+      <app-product-item
+         *ngFor="let product of products"
+         [product]="product"
+         [showDelete]="user?.role === 'admin'"
+         (deleted)="$event && removeProductFromList(product.id)"
+      ></app-product-item>
+   </ng-container>
+
+   <ng-template #noProducts>
+      <p>Nincs megjeleníthető termék</p>
+   </ng-template>
 </ng-container>
 
 <ng-template #loading> <div>Loading...</div> </ng-template>

@@ -37,7 +37,6 @@ export class ProfileComponent implements OnDestroy {
       name: this.fbNonNull.control('', [Validators.required]),
       email: this.fbNonNull.control('', [Validators.required]),
       barionEmail: this.fbNonNull.control(''),
-      barionPosKey: this.fbNonNull.control(''),
    });
 
    categoryMenuItems: MenuItem[] = [];
@@ -69,7 +68,6 @@ export class ProfileComponent implements OnDestroy {
          .subscribe(user => {
             this.profileData.setValue({
                barionEmail: user!.barionEmail ?? '',
-               barionPosKey: user!.barionPosKey ?? '',
                email: user!.email,
                name: user!.name,
             });

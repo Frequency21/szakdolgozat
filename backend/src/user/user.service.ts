@@ -38,7 +38,7 @@ export class UserService {
          qb.addSelect(['u.password']);
       }
 
-      qb.addSelect(['u.barionEmail', 'u.barionPosKey', 'u.idp']);
+      qb.addSelect(['u.barionEmail', 'u.idp']);
       qb.where('u.email = :email', { email });
       const user = await qb.getOne();
 
@@ -53,7 +53,7 @@ export class UserService {
       try {
          user = await this.usersRepository
             .createQueryBuilder('u')
-            .addSelect(['u.barionPosKey', 'u.barionEmail', 'u.idp'])
+            .addSelect(['u.barionEmail', 'u.idp'])
             .where('u.id = :id', { id })
             .getOne();
       } catch (err: any) {
@@ -97,11 +97,30 @@ export class UserService {
       }
    }
 
-   updateUser(updateUserDto: UpdateUserDto) {
-      if (updateUserDto.id == null) {
-         return null;
-      }
-      return this.usersRepository.save(updateUserDto);
+   updateUser(id: number, updateUserDto: UpdateUserDto) {
+      const { email } = updateUserDto;
+
+      return this.em.transaction(async (manager) => {
+         const user = await manager.findOne(User, {
+            select: {
+               id: true,
+               idp: true,
+               email: true,
+            },
+            where: { id },
+            lock: { mode: 'pessimistic_write' },
+         });
+
+         if (!user) throw new NotFoundException();
+
+         if (user.idp != null && email && user.email !== email) {
+            throw new BadRequestException({
+               message: 'Nem módosítható az email cím!',
+            });
+         }
+
+         return await manager.save(User, { ...user, ...updateUserDto });
+      });
    }
 
    getAllUser() {
@@ -135,7 +154,7 @@ export class UserService {
          throw new NotFoundException();
       }
 
-      if (product.buyerId != null) {
+      if (product.transactionId != null) {
          throw new BadRequestException();
       }
 
@@ -172,8 +191,8 @@ export class UserService {
          .leftJoinAndMapMany('u.baskets', Product, 'bp', 'b.productId = bp.id')
          .leftJoinAndMapOne('bp.seller', User, 'bps', 'bp.sellerId = bps.id')
          // ügyfél adatok
-         .select(['u.id', 'u.name', 'u.email', 'u.picture'])
-         .addSelect(['u.barionEmail', 'u.barionPosKey', 'u.idp'])
+         .select(['u.id', 'u.name', 'u.email', 'u.picture', 'u.role'])
+         .addSelect(['u.barionEmail', 'u.idp'])
          // kosár adatok
          .addSelect(['b'])
          .addSelect([
@@ -194,6 +213,7 @@ export class UserService {
          .where('n.userId = :id', { id: user.id })
          .andWhere('n.seen = false')
          .getMany();
+
       const [userEntity, notifications] = await Promise.all([
          userQuery,
          notificationsQuery,

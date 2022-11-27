@@ -28,3 +28,28 @@
       (click)="removeFromBasket(product.id)"
    ></button>
 </div>
+<div *ngIf="showDelete" class="remove-from-basket">
+   <button
+      pButton
+      type="button"
+      label="Termék törlése"
+      class="p-button-danger"
+      (click)="deleteProduct(product.id)"
+   ></button>
+</div>
+<div *ngIf="showRating" class="remove-from-basket">
+   <button
+      pButton
+      type="button"
+      [label]="ratingBtnLabel || 'Vevő értékelése'"
+      (click)="rating.emit()"
+   ></button>
+</div>
+<div *ngIf="showBuy" class="remove-from-basket">
+   <button
+      pButton
+      type="button"
+      label="Kifizetem"
+      (click)="buy.emit()"
+   ></button>
+</div>

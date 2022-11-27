@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit {
       }
 
       this.router.navigateByUrl(
-         user.role === Role.customer ? '/users/profile' : '/admin',
+         user.role === Role.admin ? '/admin' : '/users/profile',
       );
    };
 

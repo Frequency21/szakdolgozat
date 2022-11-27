@@ -61,7 +61,7 @@ export class CreateProductDto {
    @ApiPropertyOptional()
    @IsDateString()
    @IsOptional()
-   expiration?: Date;
+   expiration?: string;
 
    @ApiPropertyOptional()
    @Validate(PropertiesSchema)

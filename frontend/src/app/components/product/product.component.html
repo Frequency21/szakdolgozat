@@ -22,8 +22,13 @@
          </ng-template>
       </p-galleria>
       <div class="field col-12 md:col-7 buy-panel">
-         <ng-container *ngIf="!product.isAuction; else licit">
-            <button pButton type="button" label="Megveszem"></button>
+         <ng-container *ngIf="!product.isAuction; else auction">
+            <button
+               pButton
+               type="button"
+               label="Megveszem"
+               (click)="initializePayment(product.id)"
+            ></button>
             <button
                *ngIf="
                   !productIsInBasket(product.id);
@@ -45,22 +50,57 @@
                ></button>
             </ng-template>
          </ng-container>
-         <ng-template #licit>
-            <span class="p-float-label"
-               ><p-inputNumber
-                  #licitInput
-                  [ngModel]="0"
-                  inputId="licit"
-                  [min]="0"
-               ></p-inputNumber>
-               <label for="licit">Licit</label>
-            </span>
-            <button
-               pButton
-               type="button"
-               label="Licitálok"
-               [disabled]="licitInput.value < product.minBid!"
-            ></button>
+         <ng-template #auction>
+            <ng-container *ngIf="!isExpired(product); else expired">
+               <span class="p-float-label"
+                  ><p-inputNumber
+                     #licitInput
+                     [ngModel]="bidValue"
+                     inputId="licit"
+                     [min]="0"
+                     (onInput)="bidValue = $event.value"
+                  ></p-inputNumber>
+                  <label for="licit">Licit</label>
+               </span>
+               <button
+                  pButton
+                  type="button"
+                  label="Licitálok"
+                  [disabled]="bidValue < product.minBid!"
+                  (click)="bid(product.price + bidValue, product.id)"
+               ></button>
+               <div>Új ár: {{ product.price + bidValue }} Ft</div>
+               <div *ngIf="product.highestBidder" class="winner__wrapper">
+                  Jelenlegi nyertes:
+                  <span class="winner link">
+                     <img
+                        class="avatar-mini"
+                        [src]="product.highestBidder.picture"
+                     />
+                     {{ product.highestBidder.name }}
+                  </span>
+               </div>
+            </ng-container>
+            <ng-template #expired>
+               <button
+                  *ngIf="user && product.highestBidder?.id === user.id"
+                  pButton
+                  type="button"
+                  label="Kifizetem"
+                  (click)="initializePayment(product.id)"
+               ></button>
+               <div> Az aukció lezárult! </div>
+               <div *ngIf="product.highestBidder" class="winner__wrapper">
+                  Nyertes:
+                  <span class="winner link">
+                     <img
+                        class="avatar-mini"
+                        [src]="product.highestBidder.picture"
+                     />
+                     {{ product.highestBidder.name }}
+                  </span>
+               </div>
+            </ng-template>
          </ng-template>
       </div>
 

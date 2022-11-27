@@ -1,0 +1,15 @@
+:host {
+    display: block;
+    padding: 1rem;
+}
+
+.rating-form {
+    > *:not(:last-child) {
+        margin-bottom: 1rem;
+
+        label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+    }
+}

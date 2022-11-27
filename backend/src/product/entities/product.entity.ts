@@ -1,9 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Payment } from 'src/barion/entities/payment.entity';
 import {
    Category,
    CategoryProperties,
 } from 'src/category/entities/category.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
+import { BuyerRating } from 'src/rating/entities/buyer-rating.entity';
+import { SellerRating } from 'src/rating/entities/seller-rating.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
    Column,
@@ -14,6 +17,7 @@ import {
    ManyToMany,
    ManyToOne,
    OneToMany,
+   OneToOne,
    PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -37,7 +41,7 @@ export class Product {
    id!: number;
 
    @CreateDateColumn({ name: 'created_date', type: 'date' })
-   createdDate!: Date;
+   createdDate!: string;
 
    @ApiProperty({ example: 'karóra' })
    @Column()
@@ -81,7 +85,7 @@ export class Product {
 
    @ApiPropertyOptional()
    @Column('date', { nullable: true })
-   expiration!: Date | null;
+   expiration!: string | null;
 
    @Column('jsonb', { default: {} })
    properties!: CategoryProperties;
@@ -94,17 +98,11 @@ export class Product {
    @Column({ name: 'sellerId' })
    sellerId!: number;
 
-   @ApiProperty({ type: () => User })
-   @ManyToOne(() => User, (user) => user.boughtProducts, { nullable: true })
-   @JoinColumn({ name: 'buyerId' })
-   buyer?: User | null;
-
-   @ApiPropertyOptional()
-   @Column({ name: 'buyerId', type: 'int4', nullable: true })
-   buyerId!: number | null;
-
    @ApiProperty({ type: () => [User] })
-   @ManyToMany(() => User, (user) => user.baskets)
+   @ManyToMany(() => User, (user) => user.baskets, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+   })
    basketOwners?: User[];
 
    @ApiProperty({ type: () => Category })
@@ -119,4 +117,28 @@ export class Product {
    @ApiPropertyOptional({ type: [Notification], default: [] })
    @OneToMany(() => Notification, (notification) => notification.product)
    notifications?: Notification[];
+
+   @ManyToOne(() => Payment, (payment) => payment.products, {
+      nullable: true,
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+   })
+   @JoinColumn({ name: 'transactionId' })
+   transaction?: Payment;
+
+   @Column({ type: 'int4', name: 'transactionId', nullable: true })
+   transactionId!: number | null;
+
+   @ManyToOne(() => User, (user) => user.biddenProducts, { nullable: true })
+   @JoinColumn({ name: 'highestBidderId' })
+   highestBidder?: User | null;
+
+   @Column({ type: 'int4', name: 'highestBidderId', nullable: true })
+   highestBidderId!: number | null;
+
+   @OneToOne(() => BuyerRating, (rating) => rating.product)
+   buyerRating?: BuyerRating;
+
+   @OneToOne(() => SellerRating, (rating) => rating.product)
+   sellerRating?: SellerRating;
 }

@@ -5,6 +5,13 @@ import { Brackets, Repository } from 'typeorm';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './entities/message.entity';
 
+type MessagePartner = {
+   id: number;
+   name: string;
+   picture: string[];
+   unseenMessages: number;
+};
+
 @Injectable()
 export class MessageService {
    constructor(
@@ -61,15 +68,9 @@ export class MessageService {
       return `This action removes a #${id} message`;
    }
 
-   async getPartners(id: number): Promise<
-      {
-         id: number;
-         name: string;
-         picture: string[];
-         unseenMessages: number;
-      }[]
-   > {
-      const messagePartners = await this.messageRepo
+   async getPartners(id: number): Promise<MessagePartner[]> {
+      // tartalmazhat ismétlődéseket, amennyiben kétirányú volt a beszélgetés
+      const repeatedMessagePartners = await this.messageRepo
          .createQueryBuilder('m')
          .select([
             'sender.id as "senderId"',
@@ -99,7 +100,9 @@ export class MessageService {
          .setParameter('id', id)
          .getRawMany();
 
-      return messagePartners.map((partner) => {
+      const messagePartners = new Map<number, MessagePartner>();
+
+      repeatedMessagePartners.forEach((partner) => {
          const {
             senderId,
             senderName,
@@ -110,20 +113,23 @@ export class MessageService {
             ...result
          } = partner;
          if (senderId === id) {
-            return {
+            messagePartners.set(receiverId, {
                ...result,
                id: receiverId,
                name: receiverName,
                picture: receiverPicture,
-            };
+            });
+            return;
          }
-         return {
+         messagePartners.set(senderId, {
             ...result,
             id: senderId,
             name: senderName,
             picture: senderPicture,
-         };
+         });
       });
+
+      return [...messagePartners.values()];
    }
 
    seenMessages(id: any, partnerId: number) {

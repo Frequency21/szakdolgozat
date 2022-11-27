@@ -25,7 +25,7 @@ p-galleria {
     justify-content: center;
     align-items: center;
     gap: 16px;
-    
+
     button {
         max-width: 200px;
     }
@@ -39,7 +39,8 @@ p-galleria {
     }
 }
 
-.seller {
+.seller,
+.winner {
     display: inline-flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -50,8 +51,17 @@ p-galleria {
     }
 }
 
+.winner {
+    margin-left: 8px;
+    margin-bottom: 0;
+
+    &__wrapper {
+        display: flex;
+        align-items: center;
+    }
+}
+
 .description {
     word-break: break-all;
     white-space: pre-line;
 }
-

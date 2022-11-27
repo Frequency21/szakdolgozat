@@ -237,6 +237,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          ];
       }
 
+      categoriesItem.items!.unshift({
+         label: 'Megfigyelt kategóriák',
+         icon: 'pi pi-filter',
+         routerLink: ['users', 'category-filters'],
+      });
+
       return [
          {
             label: 'Profil',
@@ -250,9 +256,30 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          },
          categoriesItem,
          {
-            label: 'Megfigyelt kategóriák',
-            icon: 'pi pi-filter',
-            routerLink: ['users', 'category-filters'],
+            label: 'Üzleteim',
+            icon: 'pi pi-dollar',
+            items: [
+               {
+                  label: 'Megnyert licitek',
+                  routerLink: ['products', 'won'],
+               },
+               {
+                  label: 'Megvásárolt termékek',
+                  routerLink: ['products', 'bought'],
+               },
+               {
+                  label: 'Sikeres hírdetéseim',
+                  routerLink: ['products', 'success'],
+               },
+               {
+                  label: 'Függőben lévő hírdetéseim',
+                  routerLink: ['products', 'pending'],
+               },
+               {
+                  label: 'Lejárt hírdetéseim',
+                  routerLink: ['products', 'expired'],
+               },
+            ],
          },
          {
             label: 'Hírdetés feladása',
