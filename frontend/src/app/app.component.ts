@@ -256,6 +256,32 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewChecked {
          },
          categoriesItem,
          {
+            label: 'Üzleteim',
+            icon: 'pi pi-dollar',
+            items: [
+               {
+                  label: 'Megnyert licitek',
+                  routerLink: ['products', 'won'],
+               },
+               {
+                  label: 'Megvásárolt termékek',
+                  routerLink: ['products', 'bought'],
+               },
+               {
+                  label: 'Sikeres hírdetéseim',
+                  routerLink: ['products', 'success'],
+               },
+               {
+                  label: 'Függőben lévő hírdetéseim',
+                  routerLink: ['products', 'pending'],
+               },
+               {
+                  label: 'Lejárt hírdetéseim',
+                  routerLink: ['products', 'expired'],
+               },
+            ],
+         },
+         {
             label: 'Hírdetés feladása',
             icon: 'pi pi-box',
             routerLink: ['users', 'create-product'],

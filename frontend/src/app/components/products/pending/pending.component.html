@@ -1,0 +1,16 @@
+<ng-container *ngIf="products; else loading">
+   <ng-container *ngIf="products.length > 0; else noProducts">
+      <app-product-item
+         *ngFor="let product of products"
+         [product]="product"
+         [showDelete]="true"
+         (deleted)="$event && onProductDelete(product.id)"
+      ></app-product-item>
+   </ng-container>
+
+   <ng-template #noProducts>
+      <p>Nincs megjeleníthető termék</p>
+   </ng-template>
+</ng-container>
+
+<ng-template #loading> <div>Loading...</div> </ng-template>

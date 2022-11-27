@@ -4,8 +4,9 @@ import {
    Controller,
    Delete,
    Get,
+   InternalServerErrorException,
    Param,
-   Patch,
+   ParseIntPipe,
    Post,
    Query,
    UseGuards,
@@ -18,7 +19,6 @@ import { User } from 'src/user/entities/user.entity';
 import { BidDto } from './dto/bid.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FindProductDto } from './dto/find-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
 
@@ -53,24 +53,76 @@ export class ProductController {
       return this.productService.findWhere(findProductDto);
    }
 
-   @Get(':id')
-   findOne(@Param('id') id: string): Promise<Product> {
-      return this.productService.findOne(+id);
-   }
-
-   @Patch(':id')
-   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-      return this.productService.update(+id, updateProductDto);
-   }
-
-   @Delete(':id')
-   remove(@Param('id') id: string) {
-      return this.productService.remove(+id);
-   }
-
    @UseGuards(CookieAuthGuard)
    @Post('bid')
    bid(@Body() { newPrice, productId }: BidDto, @CurrentUser() user: User) {
       return this.productService.bid(user, newPrice, productId);
+   }
+
+   /** megvett termékek */
+   @UseGuards(CookieAuthGuard)
+   @Get('bought')
+   findBoughtProductsForBuyer(@CurrentUser() user: User): Promise<Product[]> {
+      return this.productService.boughtProductsForBuyer(user.id);
+   }
+
+   /** lejárt aukciók */
+   @UseGuards(CookieAuthGuard)
+   @Get('expired')
+   findExpiredAuctionsForSeller(
+      @CurrentUser() seller: User,
+   ): Promise<Product[]> {
+      return this.productService.expiredAuctionsForSeller(seller.id);
+   }
+
+   /** függőben lévő hírdetések (aukciók is) */
+   @UseGuards(CookieAuthGuard)
+   @Get('pending')
+   findPendingProductsForSeller(
+      @CurrentUser() seller: User,
+   ): Promise<Product[]> {
+      return this.productService.pendingProductsForSeller(seller.id);
+   }
+
+   /** sikeres hírdetések */
+   @UseGuards(CookieAuthGuard)
+   @Get('success')
+   findSuccessProductsForSeller(
+      @CurrentUser() seller: User,
+   ): Promise<Product[]> {
+      return this.productService.successProductsForSeller(seller.id);
+   }
+
+   /** sikeres aukciók */
+   @UseGuards(CookieAuthGuard)
+   @Get('success-auctions')
+   findSuccessAuctionsForBuyer(@CurrentUser() buyer: User): Promise<Product[]> {
+      return this.productService.successAuctionsForBuyer(buyer.id);
+   }
+
+   /** megnyert aukciók */
+   @UseGuards(CookieAuthGuard)
+   @Get('won')
+   findWonAuctionsForBuyer(@CurrentUser() buyer: User): Promise<Product[]> {
+      return this.productService.wonAuctionsForBuyer(buyer.id);
+   }
+
+   @Get(':id')
+   findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+      return this.productService.findOne(id);
+   }
+
+   @UseGuards(CookieAuthGuard)
+   @Delete(':id')
+   async remove(
+      @CurrentUser() user: User,
+      @Param('id', ParseIntPipe) id: number,
+   ): Promise<void> {
+      const affected = await this.productService.remove(user, id);
+      if (affected !== 1) {
+         throw new InternalServerErrorException({
+            message: 'Sikertelen törlés',
+         });
+      }
    }
 }

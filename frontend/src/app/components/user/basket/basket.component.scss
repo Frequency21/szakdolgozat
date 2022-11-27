@@ -10,21 +10,6 @@
     padding: 1rem;
 }
 
-app-product-item {
-    display: flex;
-    flex-flow: column;
-
-    max-width: 100%;
-
-    &:not(:last-of-type) {
-        margin-bottom: 2rem;
-    }
-
-    @include desktop() {
-        flex-flow: row;
-    }
-}
-
 @include desktop() {
     .pay-button {
         max-width: 500px;

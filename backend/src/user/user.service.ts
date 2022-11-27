@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/constants/db/postgresql.error.codes';
 import { Notification } from 'src/notification/entities/notification.entity';
 import { Product } from 'src/product/entities/product.entity';
-import { EntityManager, Raw, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { RegisterWithPasswordDto } from './dto/register-with-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GoogleUser, User } from './entities/user.entity';
@@ -38,7 +38,7 @@ export class UserService {
          qb.addSelect(['u.password']);
       }
 
-      qb.addSelect(['u.barionEmail', 'u.barionPosKey', 'u.idp']);
+      qb.addSelect(['u.barionEmail', 'u.idp']);
       qb.where('u.email = :email', { email });
       const user = await qb.getOne();
 
@@ -53,7 +53,7 @@ export class UserService {
       try {
          user = await this.usersRepository
             .createQueryBuilder('u')
-            .addSelect(['u.barionPosKey', 'u.barionEmail', 'u.idp'])
+            .addSelect(['u.barionEmail', 'u.idp'])
             .where('u.id = :id', { id })
             .getOne();
       } catch (err: any) {
@@ -97,11 +97,30 @@ export class UserService {
       }
    }
 
-   updateUser(updateUserDto: UpdateUserDto) {
-      if (updateUserDto.id == null) {
-         return null;
-      }
-      return this.usersRepository.save(updateUserDto);
+   updateUser(id: number, updateUserDto: UpdateUserDto) {
+      const { email } = updateUserDto;
+
+      return this.em.transaction(async (manager) => {
+         const user = await manager.findOne(User, {
+            select: {
+               id: true,
+               idp: true,
+               email: true,
+            },
+            where: { id },
+            lock: { mode: 'pessimistic_write' },
+         });
+
+         if (!user) throw new NotFoundException();
+
+         if (user.idp != null && email && user.email !== email) {
+            throw new BadRequestException({
+               message: 'Nem módosítható az email cím!',
+            });
+         }
+
+         return await manager.save(User, { ...user, ...updateUserDto });
+      });
    }
 
    getAllUser() {
@@ -173,7 +192,7 @@ export class UserService {
          .leftJoinAndMapOne('bp.seller', User, 'bps', 'bp.sellerId = bps.id')
          // ügyfél adatok
          .select(['u.id', 'u.name', 'u.email', 'u.picture', 'u.role'])
-         .addSelect(['u.barionEmail', 'u.barionPosKey', 'u.idp'])
+         .addSelect(['u.barionEmail', 'u.idp'])
          // kosár adatok
          .addSelect(['b'])
          .addSelect([
@@ -194,35 +213,12 @@ export class UserService {
          .where('n.userId = :id', { id: user.id })
          .andWhere('n.seen = false')
          .getMany();
-      const wonUnpaidProductsQuery = this.em.find(Product, {
-         select: {
-            id: true,
-            name: true,
-            seller: {
-               id: true,
-               name: true,
-            },
-            price: true,
-            pictures: true,
-            condition: true,
-            expiration: true,
-         },
-         where: {
-            highestBidderId: user.id,
-            expiration: Raw(
-               (alias) =>
-                  `${alias} <= (date_trunc('day', (now() AT TIME ZONE 'Europe/Budapest')) AT TIME ZONE 'Europe/Budapest')::date`,
-            ),
-         },
-      });
 
-      const [userEntity, notifications, wonUnpaidProducts] = await Promise.all([
+      const [userEntity, notifications] = await Promise.all([
          userQuery,
          notificationsQuery,
-         wonUnpaidProductsQuery,
       ]);
       userEntity!.notifications = notifications;
-      userEntity!.wonUnpaidProducts = wonUnpaidProducts;
 
       return userEntity;
    }

@@ -29,12 +29,12 @@ export class ProductProperties {
    @ApiPropertyOptional()
    @IsDateString()
    @IsOptional()
-   startedFrom?: Date;
+   startedFrom?: string;
 
    @ApiPropertyOptional()
    @IsDateString()
    @IsOptional()
-   expireUntil?: Date;
+   expireUntil?: string;
 }
 
 @Entity()
@@ -57,11 +57,11 @@ export class CategoryFilter {
 
    @ApiPropertyOptional()
    @Column({ type: 'date', nullable: true })
-   startedFrom?: Date | null;
+   startedFrom!: string | null;
 
    @ApiPropertyOptional()
    @Column({ type: 'date', nullable: true })
-   expireUntil?: Date | null;
+   expireUntil!: string | null;
 
    @ApiPropertyOptional()
    @Column('jsonb', { default: {} })

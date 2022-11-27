@@ -10,6 +10,9 @@ import {
    Product,
    ProductSimple,
 } from 'src/app/models/product.model';
+import { LoginData } from 'src/app/models/user.model';
+import { diffInDaysFromNow } from 'src/app/shared/helpers/date.helper';
+import { BarionService } from 'src/app/shared/services/barion.service';
 import { MessagesService } from 'src/app/shared/services/messages.service';
 import { ProductService } from 'src/app/shared/services/product.service';
 import { UserService } from '../user/user.service';
@@ -20,6 +23,7 @@ import { UserService } from '../user/user.service';
    styleUrls: ['./product.component.scss'],
 })
 export class ProductComponent implements OnInit, OnDestroy {
+   user?: LoginData | null;
    product?: Product;
    basket?: ProductSimple[];
    galleryData: { previewImageSrc: string; thumbnailImageSrc: string }[] = [];
@@ -33,11 +37,15 @@ export class ProductComponent implements OnInit, OnDestroy {
       private messageService: MessagesService,
       private primeNgMessageService: MessageService,
       private authService: AuthService,
+      private barionService: BarionService,
    ) {}
 
    destroyed$ = new ReplaySubject<void>(1);
 
    ngOnInit(): void {
+      this.authService.user$
+         .pipe(takeUntil(this.destroyed$))
+         .subscribe(user => (this.user = user));
       this.userService.basket$$
          .pipe(takeUntil(this.destroyed$))
          .subscribe(basket => (this.basket = basket));
@@ -95,11 +103,21 @@ export class ProductComponent implements OnInit, OnDestroy {
             this.product!.price = response.product.price;
             this.product!.highestBidder!.name =
                response.product.highestBidder.name;
+            this.product!.highestBidder!.picture =
+               response.product.highestBidder.picture;
+            this.primeNgMessageService.add({
+               key: 'app',
+               data: ['Sikertelen licit!', 'Az ár frissült.'],
+               sticky: false,
+               life: 2000,
+               severity: 'error',
+            });
             return;
          }
 
          this.product!.price = newPrice;
          this.product!.highestBidder!.name = this.authService.user!.name;
+         this.product!.highestBidder!.picture = this.authService.user!.picture;
          this.primeNgMessageService.add({
             key: 'app',
             data: ['Sikeres licit!'],
@@ -108,5 +126,22 @@ export class ProductComponent implements OnInit, OnDestroy {
             severity: 'success',
          });
       });
+   }
+
+   rating() {
+      this.productService.rating().subscribe();
+   }
+
+   // product.highestBidder?.id !== this.user?.id
+   isExpired(product: Product) {
+      return product.expiration && diffInDaysFromNow(product.expiration) >= 0;
+   }
+
+   initializePayment(productId: number) {
+      this.barionService
+         .initializePayment([productId])
+         .subscribe(
+            barionGatewayUrl => (window.location.href = barionGatewayUrl),
+         );
    }
 }

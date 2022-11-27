@@ -52,10 +52,6 @@ export class User {
    @Column('enum', { enum: Role, default: Role.customer })
    role!: Role;
 
-   @ApiPropertyOptional({ example: 'random UUID' })
-   @Column({ type: 'text', nullable: true, select: false })
-   barionPosKey!: string | null;
-
    @ApiPropertyOptional({ example: 'random email' })
    @Column({ type: 'text', nullable: true, select: false })
    barionEmail!: string | null;
@@ -65,7 +61,10 @@ export class User {
    products!: Product[];
 
    @ApiPropertyOptional({ type: [Product], default: [] })
-   @ManyToMany(() => Product, (product) => product.basketOwners)
+   @ManyToMany(() => Product, (product) => product.basketOwners, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+   })
    @JoinTable({
       name: 'user_baskets',
       joinColumn: { name: 'userId' },
@@ -94,8 +93,6 @@ export class User {
 
    @OneToMany(() => Product, (product) => product.highestBidder)
    biddenProducts?: Product[];
-
-   wonUnpaidProducts?: Product[];
 }
 
 export type GoogleUser = Required<Pick<User, 'email' | 'name' | 'idp'>> &

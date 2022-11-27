@@ -20,7 +20,7 @@ export class Notification {
 
    @ApiProperty()
    @CreateDateColumn({ type: 'date' })
-   createdDate!: Date;
+   createdDate!: string;
 
    @ApiProperty({ example: false })
    @Column()

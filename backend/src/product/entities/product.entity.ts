@@ -5,6 +5,8 @@ import {
    CategoryProperties,
 } from 'src/category/entities/category.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
+import { BuyerRating } from 'src/rating/entities/buyer-rating.entity';
+import { SellerRating } from 'src/rating/entities/seller-rating.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
    Column,
@@ -15,6 +17,7 @@ import {
    ManyToMany,
    ManyToOne,
    OneToMany,
+   OneToOne,
    PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -38,7 +41,7 @@ export class Product {
    id!: number;
 
    @CreateDateColumn({ name: 'created_date', type: 'date' })
-   createdDate!: Date;
+   createdDate!: string;
 
    @ApiProperty({ example: 'karóra' })
    @Column()
@@ -82,7 +85,7 @@ export class Product {
 
    @ApiPropertyOptional()
    @Column('date', { nullable: true })
-   expiration!: Date | null;
+   expiration!: string | null;
 
    @Column('jsonb', { default: {} })
    properties!: CategoryProperties;
@@ -96,7 +99,10 @@ export class Product {
    sellerId!: number;
 
    @ApiProperty({ type: () => [User] })
-   @ManyToMany(() => User, (user) => user.baskets)
+   @ManyToMany(() => User, (user) => user.baskets, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+   })
    basketOwners?: User[];
 
    @ApiProperty({ type: () => Category })
@@ -129,4 +135,10 @@ export class Product {
 
    @Column({ type: 'int4', name: 'highestBidderId', nullable: true })
    highestBidderId!: number | null;
+
+   @OneToOne(() => BuyerRating, (rating) => rating.product)
+   buyerRating?: BuyerRating;
+
+   @OneToOne(() => SellerRating, (rating) => rating.product)
+   sellerRating?: SellerRating;
 }

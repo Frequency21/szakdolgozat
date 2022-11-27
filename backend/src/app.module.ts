@@ -13,6 +13,7 @@ import { staticServeConfig } from './config/serve-static.config';
 import { MessageModule } from './message/message.module';
 import { NotificationModule } from './notification/notification.module';
 import { ProductModule } from './product/product.module';
+import { RatingModule } from './rating/rating.module';
 import { UserModule } from './user/user.module';
 import { WSMessagesModule } from './websockets/ws-main.module';
 @Module({
@@ -40,6 +41,7 @@ import { WSMessagesModule } from './websockets/ws-main.module';
       EventEmitterModule.forRoot(),
       NotificationModule,
       BarionModule,
+      RatingModule,
    ],
 })
 export class AppModule {}

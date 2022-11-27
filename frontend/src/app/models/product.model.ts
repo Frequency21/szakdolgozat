@@ -48,8 +48,11 @@ export interface ProductSimple {
    pictures: string[];
    isAuction: boolean;
    seller: User;
-   expiration?: Date;
+   expiration?: string;
    highestBidder?: User;
+   sellerRating?: {
+      id: number;
+   };
 }
 
 export interface CreateProductDto {
@@ -63,7 +66,7 @@ export interface CreateProductDto {
    condition: Condition;
    weight?: number;
    pictures: string[];
-   expiration?: Date;
+   expiration?: string | null;
    properties: CategoryProperties;
    sellerId: number;
    categoryId: number;
@@ -76,3 +79,15 @@ export type ProductProperties = {
    expireUntil?: Date;
    startedFrom?: Date;
 };
+
+export interface SellerRatingDto extends BuyerRatingDto {
+   quality: string;
+}
+
+export interface BuyerRatingDto {
+   id?: number;
+   productId: number;
+   transaction: string;
+   delivery: string;
+   communication: string;
+}

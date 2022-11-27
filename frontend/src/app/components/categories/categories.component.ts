@@ -9,7 +9,7 @@ import {
    CreateCategoryFilterDto,
 } from 'src/app/models/category.model';
 import { ProductSimple } from 'src/app/models/product.model';
-import { LoginData, Role } from 'src/app/models/user.model';
+import { LoginData } from 'src/app/models/user.model';
 import { setDateToMidnight } from 'src/app/shared/helpers/date.helper';
 import { CategoryService } from 'src/app/shared/services/category.service';
 import {
@@ -23,7 +23,7 @@ import {
    styleUrls: ['./categories.component.scss'],
 })
 export class CategoriesComponent implements OnInit, OnDestroy {
-   products?: ProductSimple[];
+   products: ProductSimple[] = [];
    category?: Category;
    properties?: [string, { multi: boolean; values: string[] }][];
    user?: LoginData | null;
@@ -161,6 +161,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
       };
 
       this.categoryService.createCategoryFilter(categoryFilter).subscribe();
+   }
+
+   removeProductFromList(id: number) {
+      const index = this.products.findIndex(p => p.id === id);
+      if (index == null) return;
+      this.products.splice(index, 1);
    }
 }
 

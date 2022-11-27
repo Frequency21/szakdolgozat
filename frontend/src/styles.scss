@@ -18,6 +18,7 @@ app-root {
 }
 
 .app-content {
+    display: flow-root;
     min-height: calc(var(--vhc) * 100);
     max-height: calc(var(--vhc) * 100);
 }

@@ -1,4 +1,5 @@
 import {
+   BadRequestException,
    ConflictException,
    Injectable,
    InternalServerErrorException,
@@ -8,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import Barion from 'node-barion';
 import { Product } from 'src/product/entities/product.entity';
+import { diffInDaysFromNow } from 'src/shared/helpers/date.helper';
 import { User } from 'src/user/entities/user.entity';
 import { EntityManager, In } from 'typeorm';
 import { Payment } from './entities/payment.entity';
@@ -63,6 +65,29 @@ export class BarionService {
                { seller: User; products: Product[] }
             >();
             for (const product of products) {
+               const diffInDays = product.expiration
+                  ? diffInDaysFromNow(product.expiration)
+                  : undefined;
+               if (
+                  product.isAuction &&
+                  product.expiration &&
+                  product.highestBidderId &&
+                  product.highestBidderId === user.id &&
+                  diffInDays !== undefined
+               ) {
+                  if (diffInDays > 6) {
+                     throw new BadRequestException({
+                        message:
+                           'A termék kifizetésére szabott határidő lejárt!',
+                     });
+                  } else if (diffInDays < 0) {
+                     throw new BadRequestException({
+                        message:
+                           'A termék kifizetéséhez meg kell várni az aukció lezártát!',
+                     });
+                  }
+               }
+
                if (product.transactionId) {
                   this.logger.error(`Conflicting product (${product.id})`);
                   throw new ConflictException({
@@ -186,13 +211,13 @@ export class BarionService {
          await this.em.query(
             `delete from user_baskets ub where ub."productId" in (
                select pr.id from product pr
-                  left join payment pa on pa."paymentId" = pr."transactionId"
+                  left join payment pa on pa."id" = pr."transactionId"
                where pa."paymentId" = $1
             )`,
             [paymentId],
          );
          return {
-            message: 'A fizetési sikeres volt.',
+            message: 'A fizetés sikeres volt.',
          };
       }
 
