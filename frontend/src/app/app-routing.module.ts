@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './auth/auth.guard';
 import { CategoriesComponent } from './components/categories/categories.component';
+import { LoginComponent } from './components/login/login.component';
 import { ProductComponent } from './components/product/product.component';
+import { RegisterComponent } from './components/register/register.component';
 import { Role } from './models/user.model';
 
 const routes: Routes = [
@@ -13,15 +14,11 @@ const routes: Routes = [
    },
    {
       path: 'login',
-      loadChildren: () =>
-         import('./components/login/login.module').then(m => m.LoginModule),
+      component: LoginComponent,
    },
    {
       path: 'register',
-      loadChildren: () =>
-         import('./components/register/register.module').then(
-            m => m.RegisterModule,
-         ),
+      component: RegisterComponent,
    },
    {
       path: 'categories/:id',
@@ -40,7 +37,6 @@ const routes: Routes = [
    },
    {
       path: 'users',
-      canActivate: [AuthGuard],
       data: {
          roles: [Role.customer],
       },
