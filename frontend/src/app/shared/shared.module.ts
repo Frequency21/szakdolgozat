@@ -20,6 +20,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RatingModule } from 'primeng/rating';
 import { RippleModule } from 'primeng/ripple';
+import { SkeletonModule } from 'primeng/skeleton';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -55,6 +56,7 @@ const SHARED_MODULES = [
    BadgeModule,
    RatingModule,
    DialogModule,
+   SkeletonModule,
 ];
 
 const SHARED_COMPONENTS = [ProductItemComponent];

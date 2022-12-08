@@ -50,9 +50,8 @@ export interface ProductSimple {
    seller: User;
    expiration?: string;
    highestBidder?: User;
-   sellerRating?: {
-      id: number;
-   };
+   sellerRating?: SellerRatingDto;
+   buyerRating?: BuyerRatingDto;
 }
 
 export interface CreateProductDto {
@@ -90,4 +89,16 @@ export interface BuyerRatingDto {
    transaction: string;
    delivery: string;
    communication: string;
+}
+
+export interface BuyerRatingStatistics {
+   sum: number;
+   productId: number;
+   transaction: number;
+   delivery: number;
+   communication: number;
+}
+
+export interface SellerRatingStatistics extends BuyerRatingStatistics {
+   quality: number;
 }

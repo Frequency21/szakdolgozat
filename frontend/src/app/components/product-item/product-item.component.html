@@ -13,7 +13,12 @@
          >Állapot: {{ displayCondition[product.condition] }}
       </div>
       <div class="price">{{ product.price }}&nbsp;Ft</div>
-      <div class="seller">Eladó: {{ product.seller.name }} </div>
+      <div
+         class="seller"
+         style="cursor: pointer"
+         (click)="navigateToProfile(product.seller.id)"
+         >Eladó: {{ product.seller.name }}
+      </div>
       <div class="expiration" *ngIf="product.expiration">
          Lejár ekkor &mdash; {{ product.expiration }}
       </div>

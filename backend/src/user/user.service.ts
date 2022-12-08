@@ -7,10 +7,16 @@ import {
    NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
+import { Payment } from 'src/barion/entities/payment.entity';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/constants/db/postgresql.error.codes';
 import { Notification } from 'src/notification/entities/notification.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { BuyerRatingStatisticsDto } from 'src/rating/dto/buyer-rating-statistics.dto';
+import { BuyerRating } from 'src/rating/entities/buyer-rating.entity';
+import { SellerRating } from 'src/rating/entities/seller-rating.entity';
 import { EntityManager, Repository } from 'typeorm';
+import { SellerRatingStatisticsDto } from '../rating/dto/seller-rating-statistics.dto';
 import { RegisterWithPasswordDto } from './dto/register-with-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GoogleUser, User } from './entities/user.entity';
@@ -221,5 +227,71 @@ export class UserService {
       userEntity!.notifications = notifications;
 
       return userEntity;
+   }
+
+   async getStatisticsForUser(id: number) {
+      const sellerRatingStatisticsQuery = this.em
+         .createQueryBuilder(SellerRating, 'sr')
+         .select([
+            'count(*) as "sum"',
+            'avg(sr.communication::integer) as "communication"',
+            'avg(sr.delivery::integer) as "delivery"',
+            'avg(sr.transaction::integer) as "transaction"',
+            'avg(sr.quality::integer) as "quality"',
+         ])
+         .leftJoin(Product, 'p', 'sr.productId = p.id')
+         .leftJoin(User, 'u', 'p.sellerId = u.id')
+         .where('u.id = :id', { id })
+         .getRawOne()
+         .then((result) =>
+            result.sum === '0'
+               ? undefined
+               : plainToClass(SellerRatingStatisticsDto, result, {
+                    enableImplicitConversion: true,
+                 }),
+         );
+
+      const buyerRatingStatisticsQuery = this.em
+         .createQueryBuilder(BuyerRating, 'br')
+         .select([
+            'count(*) as "sum"',
+            'avg(br.communication::integer) as "communication"',
+            'avg(br.delivery::integer) as "delivery"',
+            'avg(br.transaction::integer) as "transaction"',
+         ])
+         .leftJoin(Product, 'pr', 'br.productId = pr.id')
+         .leftJoin(Payment, 'pa', 'pa.id = pr.transactionId')
+         .leftJoin(User, 'u', 'pa.buyerId = u.id')
+         .where('u.id = :id', { id })
+         .getRawOne()
+         .then((result) =>
+            result.sum === '0'
+               ? undefined
+               : plainToClass(BuyerRatingStatisticsDto, result, {
+                    enableImplicitConversion: true,
+                 }),
+         );
+
+      const profileDataQuery = this.em.findOne(User, {
+         select: {
+            name: true,
+            email: true,
+            picture: true,
+         },
+         where: { id },
+      });
+
+      const [sellerRatingStatistics, buyerRatingStatistics, profileData] =
+         await Promise.all([
+            sellerRatingStatisticsQuery,
+            buyerRatingStatisticsQuery,
+            profileDataQuery,
+         ]);
+
+      return {
+         sellerRatingStatistics,
+         buyerRatingStatistics,
+         profileData: profileData!,
+      };
    }
 }

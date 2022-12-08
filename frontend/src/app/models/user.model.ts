@@ -9,7 +9,8 @@ export enum Role {
 export type User = {
    id: number;
    name: string;
-   picture?: string;
+   picture?: string | null;
+   email: string;
 };
 
 export type LoginData = {

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
    ValidationArguments,
    ValidatorConstraint,
@@ -6,18 +7,22 @@ import {
 import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export abstract class Rating {
+   @ApiProperty()
    @PrimaryGeneratedColumn()
    id!: number;
 
    /** Fizetési lehetőségek, fizetési gondok, késések, nem fizetett */
+   @ApiProperty()
    @Column()
    transaction!: string;
 
    /** Átvétel - átadás */
+   @ApiProperty()
    @Column()
    delivery!: string;
 
    /** kapcsolatfelvétel, kommunikáció */
+   @ApiProperty()
    @Column()
    communication!: string;
 }

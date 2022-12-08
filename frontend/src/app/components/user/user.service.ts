@@ -2,8 +2,19 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { Product, ProductSimple } from 'src/app/models/product.model';
-import { LoginData, UpdateUserDto } from 'src/app/models/user.model';
+import {
+   BuyerRatingStatistics,
+   Product,
+   ProductSimple,
+   SellerRatingStatistics,
+} from 'src/app/models/product.model';
+import { LoginData, UpdateUserDto, User } from 'src/app/models/user.model';
+
+export type RatingsStatistics = {
+   profileData: Pick<User, 'id' | 'name' | 'picture' | 'email'>;
+   sellerRatingStatistics?: SellerRatingStatistics;
+   buyerRatingStatistics?: BuyerRatingStatistics;
+};
 
 @Injectable({
    providedIn: 'root',
@@ -49,5 +60,9 @@ export class UserService {
             this.basket$$.next(basket);
          }),
       );
+   }
+
+   profileStatistics(userId: number) {
+      return this.http.get<RatingsStatistics>(`/api/user/statistics/${userId}`);
    }
 }
