@@ -10,10 +10,12 @@ import {
    UseGuards,
    UseInterceptors,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { CookieAuthGuard } from 'src/auth/guards/cookie-auth.guard';
 import { Product } from 'src/product/entities/product.entity';
+import { BuyerRatingStatisticsDto } from 'src/rating/dto/buyer-rating-statistics.dto';
+import { SellerRatingStatisticsDto } from 'src/rating/dto/seller-rating-statistics.dto';
 import { CurrentUser } from 'src/shared/decorators/user.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -24,14 +26,6 @@ import { UserService } from './user.service';
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
    constructor(private userService: UserService) {}
-
-   @Post('greeting')
-   greetingMessage(@Body() body: { msg: string }) {
-      console.log(body.msg);
-      return {
-         message: 'Bonjour',
-      };
-   }
 
    @UseGuards(CookieAuthGuard)
    @ApiCreatedResponse({
@@ -45,15 +39,6 @@ export class UserController {
    ) {
       const res = await this.userService.updateUser(user.id, updateUserDto);
       return plainToClass(User, res);
-   }
-
-   @ApiOkResponse({
-      type: [User],
-      description: 'Get all users',
-   })
-   @Get()
-   getAllUser() {
-      return this.userService.getAllUser();
    }
 
    @UseGuards(CookieAuthGuard)
@@ -78,5 +63,14 @@ export class UserController {
       @CurrentUser() user: User,
    ): Promise<void> {
       return this.userService.removeProductFromBasket(user, productId);
+   }
+
+   @Get('statistics/:id')
+   getStatistics(@Param('id') id: number): Promise<{
+      profileData: Pick<User, 'email' | 'name' | 'picture'>;
+      sellerRatingStatistics: SellerRatingStatisticsDto | undefined;
+      buyerRatingStatistics: BuyerRatingStatisticsDto | undefined;
+   }> {
+      return this.userService.getStatisticsForUser(id);
    }
 }

@@ -354,7 +354,7 @@ export class ProductService {
          },
          relations: {
             seller: true,
-            sellerRating: true,
+            buyerRating: true,
          },
          where: {
             sellerId: id,

@@ -1,11 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
 import { ReplaySubject, takeUntil } from 'rxjs';
-import {
-   BuyerRatingDto,
-   ProductSimple,
-   SellerRatingDto,
-} from 'src/app/models/product.model';
+import { BuyerRatingDto, ProductSimple } from 'src/app/models/product.model';
 import { ProductService } from 'src/app/shared/services/product.service';
 
 @Component({
@@ -43,8 +39,9 @@ export class SuccessComponent implements OnDestroy {
    }
 
    showRatingDialog(product: ProductSimple) {
+      this.ratingForm.reset();
       this.ratingForm.patchValue({
-         ...product.sellerRating,
+         ...(product.buyerRating as any),
          productId: product!.id,
       });
       this.ratingDialogVisible = true;
@@ -60,8 +57,11 @@ export class SuccessComponent implements OnDestroy {
          delivery: '' + value.delivery,
       };
 
-      this.productService
-         .rateBuyer(dto)
-         .subscribe(() => (this.ratingDialogVisible = false));
+      this.productService.rateBuyer(dto).subscribe(() => {
+         this.ratingDialogVisible = false;
+         const index = this.products.findIndex(p => p.id === dto.productId);
+         if (!index) return;
+         this.products[index].buyerRating = dto;
+      });
    }
 }

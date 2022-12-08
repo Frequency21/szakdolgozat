@@ -13,6 +13,7 @@ import { ProductComponent } from './components/product/product.component';
 import { RegisterComponent } from './components/register/register.component';
 import { GlobalErrorHandler } from './shared/global.error.handler';
 import { SharedModule } from './shared/shared.module';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
    declarations: [
@@ -21,6 +22,7 @@ import { SharedModule } from './shared/shared.module';
       RegisterComponent,
       CategoriesComponent,
       ProductComponent,
+      ProfileComponent,
    ],
    imports: [
       AppRoutingModule,

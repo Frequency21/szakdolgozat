@@ -47,4 +47,8 @@ export class ProductItemComponent implements OnInit {
          error: () => this.deleted.emit(false),
       });
    }
+
+   navigateToProfile(id: number) {
+      this.router.navigate(['profile', id]);
+   }
 }

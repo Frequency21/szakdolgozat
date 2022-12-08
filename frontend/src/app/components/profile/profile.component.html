@@ -1,0 +1,83 @@
+<ng-container *ngIf="statistics; else loading">
+   <div class="header">
+      <img
+         style="
+            max-width: 100px;
+            max-height: 100px;
+            aspect-ratio: 1;
+            border-radius: 100000px;
+            object-fit: cover;
+         "
+         [src]="statistics.profileData.picture"
+      />
+      <div class="name">{{ statistics.profileData.name }}</div>
+   </div>
+   <div class="ratings">
+      <div
+         class="seller-ratings"
+         *ngIf="statistics.sellerRatingStatistics; else noSellingRatings"
+      >
+         <div><b>Értékelések, mint eladóként</b></div>
+         <div
+            ><span>Összes értékelés:</span>
+            {{ statistics.sellerRatingStatistics.sum }}
+         </div>
+         <div
+            ><span>Árú minősége:</span>
+            {{ statistics.sellerRatingStatistics.quality }} / 5
+         </div>
+         <div
+            ><span>Tranzakció lebonyolítása:</span>
+            {{ statistics.sellerRatingStatistics.transaction }} / 5
+         </div>
+         <div
+            ><span>Szállítás:</span>
+            {{ statistics.sellerRatingStatistics.delivery }} / 5
+         </div>
+         <div
+            ><span>Kapcsolatfelvétel, kommunikáció:</span>
+            {{ statistics.sellerRatingStatistics.communication }} / 5
+         </div>
+      </div>
+      <ng-template #noSellingRatings>
+         <div>A felhasználónak nincs még eladói értékelése</div>
+      </ng-template>
+
+      <div
+         class="buyer-ratings"
+         *ngIf="statistics.buyerRatingStatistics; else noBuyerRatings"
+      >
+         <div><b>Értékelések, mint vásárlóként</b></div>
+         <div
+            ><span>Összes értékelés:</span>
+            {{ statistics.buyerRatingStatistics.sum }}
+         </div>
+         <div
+            ><span>Tranzakció lebonyolítása:</span>
+            {{ statistics.buyerRatingStatistics.transaction }} / 5
+         </div>
+         <div
+            ><span>Szállítás:</span>
+            {{ statistics.buyerRatingStatistics.delivery }} / 5
+         </div>
+         <div
+            ><span>Kapcsolatfelvétel, kommunikáció:</span>
+            {{ statistics.buyerRatingStatistics.communication }} / 5
+         </div>
+      </div>
+   </div>
+   <ng-template #noBuyerRatings>
+      <div>A felhasználónak nincs még vásárlói értékelése</div>
+   </ng-template>
+</ng-container>
+
+<ng-template #loading>
+   <div class="header">
+      <p-skeleton shape="circle" width="100px" height="100px"></p-skeleton>
+      <p-skeleton
+         class="name-skeleton"
+         height="25px"
+         width="100px"
+      ></p-skeleton>
+   </div>
+</ng-template>

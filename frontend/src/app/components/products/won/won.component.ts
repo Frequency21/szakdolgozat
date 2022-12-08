@@ -42,8 +42,9 @@ export class WonComponent implements OnDestroy {
    }
 
    showRatingDialog(product: ProductSimple) {
+      this.ratingForm.reset();
       this.ratingForm.patchValue({
-         ...product.sellerRating,
+         ...(product.sellerRating as any),
          productId: product!.id,
       });
       this.ratingDialogVisible = true;
@@ -52,7 +53,7 @@ export class WonComponent implements OnDestroy {
    closeDialog() {
       const value = this.ratingForm.value;
       const dto: SellerRatingDto = {
-         id: value.id,
+         id: value.id!,
          productId: value.productId!,
          communication: '' + value.communication,
          transaction: '' + value.transaction,
@@ -60,9 +61,12 @@ export class WonComponent implements OnDestroy {
          delivery: '' + value.delivery,
       };
 
-      this.productService
-         .rateSeller(dto)
-         .subscribe(() => (this.ratingDialogVisible = false));
+      this.productService.rateSeller(dto).subscribe(() => {
+         this.ratingDialogVisible = false;
+         const index = this.products.findIndex(p => p.id === dto.productId);
+         if (!index) return;
+         this.products[index].sellerRating = dto;
+      });
    }
 
    onBuy(product: ProductSimple) {
